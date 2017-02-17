@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Final Prototype</string>
+    <string name="title_commute_detail">Commute Detail</string>
+    <string name="commute_name">Commute Name:</string>
+    <string name="arr_time">Arrival Time:</string>
+    <string name="prep_time">Preparation Time:</string>
+    <string name="destination">Destination:</string>
+    <string name="add_new_commute">Add New Commute</string>
+    <string name="choose_arr_time">Choose Arrival Time</string>
+    <string name="choose_prep_time">Choose Preparation Time</string>
+    <string name="choose_destination">Choose Destination</string>
+    <string name="enter_commute_name">Enter Commute Name</string>
+</resources>

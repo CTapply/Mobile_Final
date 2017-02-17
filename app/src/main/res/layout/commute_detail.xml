@@ -1,0 +1,73 @@
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.jeffrey.finalprototype.CommuteDetailFragment">
+
+    <TextView
+        android:text="@string/commute_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:padding="5dp" />
+
+    <TextView
+        android:text="Work"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView2"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:padding="10dp" />
+
+    <TextView
+        android:text="@string/arr_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:padding="5dp" />
+
+    <TextView
+        android:text="9:00 AM"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView4"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:padding="10dp" />
+
+    <TextView
+        android:text="@string/prep_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView5"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:padding="5dp" />
+
+    <TextView
+        android:text="30 min"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView6"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:padding="10dp" />
+
+    <TextView
+        android:text="@string/destination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView7"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:padding="5dp" />
+
+    <TextView
+        android:text="100 Institute Road, Worcester MA 01609"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView8"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:padding="10dp" />
+</LinearLayout>
