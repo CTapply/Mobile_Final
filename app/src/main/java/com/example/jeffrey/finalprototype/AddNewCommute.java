@@ -38,7 +38,7 @@ public class AddNewCommute extends AppCompatActivity {
 
         // TODO replace class used for intents
         final Intent chooseArrTime = new Intent(this, PickTime.class);
-        final Intent choosePrepTime = new Intent(this, PickTime.class); // HERE
+        final Intent choosePrepTime = new Intent(this, PickNumber.class); // HERE
         final Intent chooseDestination = new Intent(this, PickTime.class); // AND HERE
 
         arrTimeButton.setOnClickListener(new View.OnClickListener() {
@@ -51,7 +51,7 @@ public class AddNewCommute extends AppCompatActivity {
         prepTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(choosePrepTime);
+                startActivityForResult(choosePrepTime, 2);
             }
         });
 
@@ -76,7 +76,13 @@ public class AddNewCommute extends AppCompatActivity {
                 //Write your code if there's no result
             }
         } else if (requestCode == 2){
-
+            if(resultCode == Activity.RESULT_OK){
+                int prepMins = data.getIntExtra("mins", 0);
+                String time = semanticPrep(prepMins);
+                selectedPrepTime.setText(time);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
         }
     }
 
@@ -132,7 +138,7 @@ public class AddNewCommute extends AppCompatActivity {
             timeMode = "PM";
         } else {
             time += Integer.toString(hold);
-            timeMode = "PM";
+            timeMode = "AM";
         }
         time += ":";
         hold = min;
