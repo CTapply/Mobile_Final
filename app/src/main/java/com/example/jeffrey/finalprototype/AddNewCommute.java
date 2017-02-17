@@ -9,6 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+
 import org.w3c.dom.Text;
 
 /**
@@ -17,6 +22,9 @@ import org.w3c.dom.Text;
 
 public class AddNewCommute extends AppCompatActivity {
 
+    private static final int ARR_TIME_REQUEST = 1;
+    private static final int PREP_TIME_REQUEST = 2;
+    private static final int PLACE_PICKER_REQUEST = 3;
     EditText editTextID;
     TextView selectedArrTime;
     TextView selectedPrepTime;
@@ -38,7 +46,7 @@ public class AddNewCommute extends AppCompatActivity {
 
         // TODO replace class used for intents
         final Intent chooseArrTime = new Intent(this, PickTime.class);
-        final Intent choosePrepTime = new Intent(this, PickNumber.class); // HERE
+        final Intent choosePrepTime = new Intent(this, PickNumber.class);
         final Intent chooseDestination = new Intent(this, PickTime.class); // AND HERE
 
         arrTimeButton.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +66,17 @@ public class AddNewCommute extends AppCompatActivity {
         destButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(chooseDestination);
+                try {
+                    PlacePicker.IntentBuilder intentBuilder =
+                            new PlacePicker.IntentBuilder();
+//                    intentBuilder.setLatLngBounds(BOUNDS_MOUNTAIN_VIEW);
+                    Intent intent = intentBuilder.build(AddNewCommute.this);
+                    startActivityForResult(intent, PLACE_PICKER_REQUEST);
+
+                } catch (GooglePlayServicesRepairableException
+                        | GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -66,7 +84,7 @@ public class AddNewCommute extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == 1) {
+        if (requestCode == ARR_TIME_REQUEST) {
             if(resultCode == Activity.RESULT_OK){
                 int arrHour = data.getIntExtra("hour", 12);
                 int arrMin = data.getIntExtra("minute", 0);
@@ -75,11 +93,19 @@ public class AddNewCommute extends AppCompatActivity {
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
-        } else if (requestCode == 2){
+        } else if (requestCode == PREP_TIME_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 int prepMins = data.getIntExtra("mins", 0);
                 String time = semanticPrep(prepMins);
                 selectedPrepTime.setText(time);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else if (requestCode == PLACE_PICKER_REQUEST){
+            if(resultCode == Activity.RESULT_OK){
+                final Place place = PlacePicker.getPlace(this, data);
+                final CharSequence address = place.getAddress();
+                selectedDestination.setText(address);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
