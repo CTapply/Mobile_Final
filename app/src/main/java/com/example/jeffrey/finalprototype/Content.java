@@ -34,7 +34,7 @@ public class Content {
         addItem(createDummyItem(1));
     }
 
-    private static void addItem(Commute item) {
+    public static void addItem(Commute item) {
         ITEMS.add(item);
         COMMUTE_MAP.put(item.id, item);
     }

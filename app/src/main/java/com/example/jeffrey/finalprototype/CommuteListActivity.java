@@ -1,5 +1,6 @@
 package com.example.jeffrey.finalprototype;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import static com.example.jeffrey.finalprototype.Content.addItem;
+
 /**
  * An activity representing a list of Commutes. This activity
  * has different presentations for handset and tablet-size devices. On
@@ -32,6 +35,7 @@ public class CommuteListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    private static final int NEW_COMMUTE_REQUEST = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,7 @@ public class CommuteListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(addCommuteIntent);
+                startActivityForResult(addCommuteIntent, NEW_COMMUTE_REQUEST);
             }
         });
 
@@ -61,6 +65,25 @@ public class CommuteListActivity extends AppCompatActivity {
             // If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == NEW_COMMUTE_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                String name = data.getStringExtra("id");
+                int arrHour = data.getIntExtra("arr_hour", 12);
+                int arrMin = data.getIntExtra("arr_min", 0);
+                int prepMins = data.getIntExtra("prep_mins", 0);
+                String destination = data.getStringExtra("destination");
+                Content.Commute newCommute = new Content.Commute(name, destination, arrHour, arrMin, prepMins);
+                addItem(newCommute);
+                View recyclerView = findViewById(R.id.commute_list);
+                assert recyclerView != null;
+                setupRecyclerView((RecyclerView) recyclerView);
+            }
         }
     }
 
