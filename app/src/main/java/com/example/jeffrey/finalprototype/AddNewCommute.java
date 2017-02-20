@@ -17,13 +17,12 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
-import org.w3c.dom.Text;
 
 /**
  * Created by Jeffrey on 2/16/2017.
  */
 
-public class AddNewCommute extends AppCompatActivity {
+public class AddNewCommute extends AppCompatActivity{
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final int ARR_TIME_REQUEST = 1;
@@ -47,11 +46,24 @@ public class AddNewCommute extends AppCompatActivity {
         Button arrTimeButton = (Button) findViewById(R.id.chooseArrTimeButton);
         Button prepTimeButton = (Button) findViewById(R.id.choosePrepTimeButton);
         Button destButton = (Button) findViewById(R.id.chooseDestButton);
+        Button addButton = (Button) findViewById(R.id.addCommuteButton);
 
-        // TODO replace class used for intents
         final Intent chooseArrTime = new Intent(this, PickTime.class);
         final Intent choosePrepTime = new Intent(this, PickNumber.class);
-        final Intent chooseDestination = new Intent(this, PickTime.class); // AND HERE
+        final Intent addCommute = new Intent(this, CommuteListActivity.class);
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addCommute.putExtra("id", editTextID.getText().toString());
+                addCommute.putExtra("arr_hour", getHourFromTime(selectedArrTime.getText().toString()));
+                addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
+                addCommute.putExtra("prep_mins", getPrepMins(selectedPrepTime.getText().toString()));
+                addCommute.putExtra("destination", selectedDestination.getText().toString());
+                setResult(Activity.RESULT_OK, addCommute);
+                finish();
+            }
+        });
 
         checkLocationPermission();
 
@@ -96,16 +108,20 @@ public class AddNewCommute extends AppCompatActivity {
                 int arrMin = data.getIntExtra("minute", 0);
                 String time = semanticTime(arrHour, arrMin);
                 selectedArrTime.setText(time);
+                System.out.println("Hour: " + getHourFromTime(selectedArrTime.getText().toString()));
+                System.out.println("Min: " + getMinFromTime(selectedArrTime.getText().toString()));
+
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
+                System.out.println("ARR_TIME ACTIVITY CANCELED");
             }
         } else if (requestCode == PREP_TIME_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 int prepMins = data.getIntExtra("mins", 0);
                 String time = semanticPrep(prepMins);
                 selectedPrepTime.setText(time);
+                System.out.println("Prep Mins: " + getPrepMins(selectedPrepTime.getText().toString()));
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
+                System.out.println("PREP_TIME ACTIVITY CANCELED");
             }
         } else if (requestCode == PLACE_PICKER_REQUEST){
             if(resultCode == Activity.RESULT_OK){
@@ -147,20 +163,22 @@ public class AddNewCommute extends AppCompatActivity {
 
     public String semanticPrep(int minutes){
         String prepTime = "";
-        if(minutes >= 60){
-            int hours = minutes / 60;
-            prepTime += Integer.toString(hours);
-            if(hours == 1)
-                prepTime += " hours ";
-            else
-                prepTime += " hour ";
-        }
-        int mins = minutes % 60;
-        prepTime += Integer.toString(mins);
-        if(mins == 1)
-            prepTime += " min";
-        else
-            prepTime += " mins";
+        prepTime += Integer.toString(minutes);
+        prepTime += " mins";
+//        if(minutes >= 60){
+//            int hours = minutes / 60;
+//            prepTime += Integer.toString(hours);
+//            if(hours == 1)
+//                prepTime += " hour ";
+//            else
+//                prepTime += " hours ";
+//        }
+//        int mins = minutes % 60;
+//        prepTime += Integer.toString(mins);
+//        if(mins == 1)
+//            prepTime += " min";
+//        else
+//            prepTime += " mins";
         return prepTime;
     }
 
@@ -200,7 +218,7 @@ public class AddNewCommute extends AppCompatActivity {
     }
 
     public int getPrepMins(String prepString){
-        int end = prepString.length() - 3;
+        int end = prepString.length() - 5;
         String minString = prepString.substring(0, end);
         return Integer.parseInt(minString);
     }
@@ -234,5 +252,4 @@ public class AddNewCommute extends AppCompatActivity {
             return true;
         }
     }
-
 }
