@@ -2,8 +2,11 @@ package com.example.jeffrey.finalprototype;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +25,7 @@ import org.w3c.dom.Text;
 
 public class AddNewCommute extends AppCompatActivity {
 
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final int ARR_TIME_REQUEST = 1;
     private static final int PREP_TIME_REQUEST = 2;
     private static final int PLACE_PICKER_REQUEST = 3;
@@ -49,17 +53,19 @@ public class AddNewCommute extends AppCompatActivity {
         final Intent choosePrepTime = new Intent(this, PickNumber.class);
         final Intent chooseDestination = new Intent(this, PickTime.class); // AND HERE
 
+        checkLocationPermission();
+
         arrTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(chooseArrTime, 1);
+                startActivityForResult(chooseArrTime, ARR_TIME_REQUEST);
             }
         });
 
         prepTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(choosePrepTime, 2);
+                startActivityForResult(choosePrepTime, PREP_TIME_REQUEST);
             }
         });
 
@@ -108,8 +114,11 @@ public class AddNewCommute extends AppCompatActivity {
                 selectedDestination.setText(address);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
+                System.out.println("Made it to Result Canceled in Place Picker");
             }
         }
+
+        System.out.println("Made it here with request code = " + requestCode);
     }
 
     @Override
@@ -195,4 +204,35 @@ public class AddNewCommute extends AppCompatActivity {
         String minString = prepString.substring(0, end);
         return Integer.parseInt(minString);
     }
+
+    public boolean checkLocationPermission(){
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Asking user if explanation is needed
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+                //Prompt the user once explanation has been shown
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 }

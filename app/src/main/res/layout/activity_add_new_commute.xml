@@ -98,7 +98,8 @@
         android:text="@string/choose_destination"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/chooseDestButton" />
+        android:id="@+id/chooseDestButton"
+        android:elevation="0dp" />
 
     <Button
         android:text="@string/add_new_commute"
