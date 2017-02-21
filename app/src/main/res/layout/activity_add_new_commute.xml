@@ -100,6 +100,90 @@
         android:layout_height="wrap_content"
         android:id="@+id/chooseDestButton" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="@string/days_of_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+            android:padding="5dp"
+            android:id="@+id/textView9"
+            android:layout_weight="1" />
+
+        <CheckBox
+            android:text="@string/repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/repeatCheckBox"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sundayButton"
+            android:layout_weight="1"
+            android:textOff="@string/s"
+            android:textOn="@string/s" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/mondayButton"
+            android:layout_weight="1"
+            android:textOff="@string/m"
+            android:textOn="@string/m" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tuesdayButton"
+            android:layout_weight="1"
+            android:textOff="@string/t"
+            android:textOn="@string/t" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/wednesdayButton"
+            android:layout_weight="1"
+            android:textOff="@string/w"
+            android:textOn="@string/w" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/thursdayButton"
+            android:layout_weight="1"
+            android:textOff="@string/t"
+            android:textOn="@string/t" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fridayButton"
+            android:layout_weight="1"
+            android:textOff="@string/f"
+            android:textOn="@string/f" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/saturdayButton"
+            android:layout_weight="1"
+            android:textOff="@string/s"
+            android:textOn="@string/s" />
+    </LinearLayout>
+
     <Button
         android:text="@string/add_new_commute"
         android:layout_width="match_parent"

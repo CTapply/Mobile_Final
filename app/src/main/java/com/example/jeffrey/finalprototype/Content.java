@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -43,7 +44,8 @@ public class Content {
         return new Commute(String.valueOf(position), "Location " + position,
                 ThreadLocalRandom.current().nextInt(1, 12 + 1), // Random hour
                 ThreadLocalRandom.current().nextInt(0, 59 + 1), // Random minute
-                ThreadLocalRandom.current().nextInt(0, 15 + 1));// Random prep time
+                ThreadLocalRandom.current().nextInt(0, 15 + 1), // Random prep time
+                new WeeklyInfo()); // Empty week info
     }
 
     private static String makeDetails(int position) {
@@ -53,6 +55,87 @@ public class Content {
             builder.append("\nMore details information here.");
         }
         return builder.toString();
+    }
+
+    public static class WeeklyInfo {
+
+        public boolean[] days;
+        public boolean repeat;
+
+        public WeeklyInfo(){
+            this.days = new boolean[7];
+            for(boolean day : this.days){
+                day = false;
+            }
+            this.repeat = false;
+        }
+
+        public WeeklyInfo(boolean[] days, boolean repeat){
+            if(days.length == 7)
+                this.days = days;
+            this.repeat = repeat;
+        }
+
+        public void setDayOn(int day){
+            this.days[day] = true;
+        }
+        public void setDayOff(int day){
+            this.days[day] = false;
+        }
+        public void setRepeat(boolean val){
+            this.repeat = val;
+        }
+
+        public String toString(){
+            if(!this.repeat)
+                return "None";
+            boolean notFirst = false;
+            String result = "Every ";
+            if(days[0]) {
+                result += "Sunday";
+                notFirst = true;
+            }
+            if(days[1]){
+                if(notFirst)
+                    result += ", ";
+                result += "Monday";
+                notFirst = true;
+            }
+            if(days[2]){
+                if(notFirst)
+                    result += ", ";
+                result += "Tuesday";
+                notFirst = true;
+            }
+            if(days[3]){
+                if(notFirst)
+                    result += ", ";
+                result += "Wednesday";
+                notFirst = true;
+            }
+            if(days[4]){
+                if(notFirst)
+                    result += ", ";
+                result += "Thursday";
+                notFirst = true;
+            }
+            if(days[5]){
+                if(notFirst)
+                    result += ", ";
+                result += "Friday";
+                notFirst = true;
+            }
+            if(days[6]){
+                if(notFirst)
+                    result += ", ";
+                result += "Saturday";
+            }
+            if(Objects.equals(result, "Every ")){
+                return "None";
+            } else {
+                return result;
+            }
+        }
     }
 
     /**
@@ -65,9 +148,10 @@ public class Content {
         public int arrivalTimeMin;
         public String timeMode;
         public int preparationTime;
+        public WeeklyInfo weekInfo;
 
         public Commute(String id, String destination, int arrivalTimeHour,
-                       int arrivalTimeMin, int preparationTime) {
+                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -78,6 +162,8 @@ public class Content {
             } else {
                 this.timeMode = "AM";
             }
+            this.weekInfo = weekInfo;
+            System.out.println(weekInfo.toString());
         }
 
         public void setDestination(String dest){
