@@ -133,8 +133,6 @@ public class AddNewCommute extends AppCompatActivity{
                 System.out.println("Made it to Result Canceled in Place Picker");
             }
         }
-
-        System.out.println("Made it here with request code = " + requestCode);
     }
 
     @Override
