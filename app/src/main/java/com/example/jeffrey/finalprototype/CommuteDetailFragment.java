@@ -63,6 +63,7 @@ public class CommuteDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.textView4)).setText(mItem.semanticTime());
             ((TextView) rootView.findViewById(R.id.textView6)).setText(mItem.semanticPrepTime());
             ((TextView) rootView.findViewById(R.id.textView8)).setText(mItem.destination);
+            ((TextView) rootView.findViewById(R.id.textView10)).setText(mItem.weekInfo.toString());
         }
 
         return rootView;

@@ -10,4 +10,12 @@
     <string name="choose_prep_time">Choose Preparation Time</string>
     <string name="choose_destination">Choose Destination</string>
     <string name="enter_commute_name">Enter Commute Name</string>
+    <string name="days_of_week">Days of the Week:</string>
+    <string name="repeat">Repeat Weekly</string>
+    <string name="repetition">Repetition:</string>
+    <string name="m">M</string>
+    <string name="t">T</string>
+    <string name="w">W</string>
+    <string name="f">F</string>
+    <string name="s">S</string>
 </resources>

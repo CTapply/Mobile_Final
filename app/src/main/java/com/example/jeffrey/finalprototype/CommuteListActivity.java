@@ -1,8 +1,11 @@
 package com.example.jeffrey.finalprototype;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +19,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+import com.example.jeffrey.finalprototype.Content.Commute;
+import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
+
 import java.util.List;
+
+import database.CommuteBaseHelper;
+import database.CommuteDbSchema;
+import database.CommuteDbSchema.CommuteTable;
 
 import static com.example.jeffrey.finalprototype.Content.addItem;
 
@@ -78,13 +88,63 @@ public class CommuteListActivity extends AppCompatActivity {
                 int arrMin = data.getIntExtra("arr_min", 0);
                 int prepMins = data.getIntExtra("prep_mins", 0);
                 String destination = data.getStringExtra("destination");
-                Content.Commute newCommute = new Content.Commute(name, destination, arrHour, arrMin, prepMins);
+
+                boolean sunday = data.getBooleanExtra("sunday", false);
+                boolean monday = data.getBooleanExtra("monday", false);
+                boolean tuesday = data.getBooleanExtra("tuesday", false);
+                boolean wednesday = data.getBooleanExtra("wednesday", false);
+                boolean thursday = data.getBooleanExtra("thursday", false);
+                boolean friday = data.getBooleanExtra("friday", false);
+                boolean saturday = data.getBooleanExtra("saturday", false);
+                boolean repeat = data.getBooleanExtra("repeat", false);
+
+                WeeklyInfo w = makeWeek(sunday, monday, tuesday, wednesday, thursday, friday,
+                            saturday, repeat);
+
+                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w);
                 addItem(newCommute);
+
                 View recyclerView = findViewById(R.id.commute_list);
                 assert recyclerView != null;
                 setupRecyclerView((RecyclerView) recyclerView);
             }
         }
+    }
+
+    public WeeklyInfo makeWeek(boolean su, boolean m, boolean tu, boolean w, boolean th,
+                               boolean f, boolean sa, boolean r){
+        boolean[] week = new boolean[7];
+        week[0] = su;
+        week[1] = m;
+        week[2] = tu;
+        week[3] = w;
+        week[4] = th;
+        week[5] = f;
+        week[6] = sa;
+        return new WeeklyInfo(week, r);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+
+        Context mContext = getApplicationContext();
+        SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
+
+//        for (Commute commute : Content.ITEMS){
+//            ContentValues values = getContentValues(commute);
+//            mDatabase.insert(CommuteTable.NAME, null, values);
+//        }
+    }
+
+    private static ContentValues getContentValues(Commute commute){
+        ContentValues values = new ContentValues();
+        values.put(CommuteTable.Cols.ID, commute.id);
+        values.put(CommuteTable.Cols.ARR_HOUR, commute.arrivalTimeHour);
+        values.put(CommuteTable.Cols.ARR_MIN, commute.arrivalTimeMin);
+        values.put(CommuteTable.Cols.PREP_MINS, commute.preparationTime);
+        values.put(CommuteTable.Cols.DESTINATION, commute.destination);
+        return values;
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -94,9 +154,9 @@ public class CommuteListActivity extends AppCompatActivity {
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<Content.Commute> mValues;
+        private final List<Commute> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<Content.Commute> items) {
+        public SimpleItemRecyclerViewAdapter(List<Commute> items) {
             mValues = items;
         }
 
@@ -144,7 +204,7 @@ public class CommuteListActivity extends AppCompatActivity {
             final View mView;
             final TextView mIdView;
             final TextView mContentView;
-            Content.Commute mItem;
+            Commute mItem;
 
             public ViewHolder(View view) {
                 super(view);

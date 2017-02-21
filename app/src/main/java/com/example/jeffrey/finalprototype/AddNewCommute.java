@@ -9,8 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -48,6 +50,15 @@ public class AddNewCommute extends AppCompatActivity{
         Button destButton = (Button) findViewById(R.id.chooseDestButton);
         Button addButton = (Button) findViewById(R.id.addCommuteButton);
 
+        final ToggleButton sunday = (ToggleButton) findViewById(R.id.sundayButton);
+        final ToggleButton monday = (ToggleButton) findViewById(R.id.mondayButton);
+        final ToggleButton tuesday = (ToggleButton) findViewById(R.id.tuesdayButton);
+        final ToggleButton wednesday = (ToggleButton) findViewById(R.id.wednesdayButton);
+        final ToggleButton thursday = (ToggleButton) findViewById(R.id.thursdayButton);
+        final ToggleButton friday = (ToggleButton) findViewById(R.id.fridayButton);
+        final ToggleButton saturday = (ToggleButton) findViewById(R.id.saturdayButton);
+        final CheckBox repeat = (CheckBox) findViewById(R.id.repeatCheckBox);
+
         final Intent chooseArrTime = new Intent(this, PickTime.class);
         final Intent choosePrepTime = new Intent(this, PickNumber.class);
         final Intent addCommute = new Intent(this, CommuteListActivity.class);
@@ -60,6 +71,14 @@ public class AddNewCommute extends AppCompatActivity{
                 addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
                 addCommute.putExtra("prep_mins", getPrepMins(selectedPrepTime.getText().toString()));
                 addCommute.putExtra("destination", selectedDestination.getText().toString());
+                addCommute.putExtra("sunday", sunday.isChecked());
+                addCommute.putExtra("monday", monday.isChecked());
+                addCommute.putExtra("tuesday", tuesday.isChecked());
+                addCommute.putExtra("wednesday", wednesday.isChecked());
+                addCommute.putExtra("thursday", thursday.isChecked());
+                addCommute.putExtra("friday", friday.isChecked());
+                addCommute.putExtra("saturday", saturday.isChecked());
+                addCommute.putExtra("repeat", repeat.isChecked());
                 setResult(Activity.RESULT_OK, addCommute);
                 finish();
             }
