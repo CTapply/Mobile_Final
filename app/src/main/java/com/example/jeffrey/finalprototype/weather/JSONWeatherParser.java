@@ -40,7 +40,15 @@ public class JSONWeatherParser {
 		
 		JSONObject mainObj = getObject("main", jObj);
 		weather.temperature.setTemp(getFloat("temp", mainObj));
-		
+
+		// Get snowfall data
+        try {
+            JSONObject wSnow = getObject("snow", jObj);
+            weather.snow.setAmount(getFloat("3h", wSnow));
+        } catch (JSONException e){
+            weather.snow.setAmount(0.0f); // set it to 0 if there is no snow field
+        }
+
 		return weather;
 	}
 	

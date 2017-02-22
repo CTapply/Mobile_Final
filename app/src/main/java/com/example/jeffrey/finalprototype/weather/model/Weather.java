@@ -17,6 +17,7 @@ package com.example.jeffrey.finalprototype.weather.model;
 public class Weather {
 	public CurrentCondition currentCondition = new CurrentCondition();
 	public Temperature temperature = new Temperature();
+    public Snow snow = new Snow();
 	
 	public  class CurrentCondition {
 		private int weatherId;
@@ -60,4 +61,15 @@ public class Weather {
 			this.temp = temp;
 		}
 	}
+
+    /**
+     * Handles information related to current snowfall readings
+     * NOTE: This is not a forecast, only a measure of Snow volume in last 3 hours
+     */
+	public class Snow {
+        private float amount;
+
+        public float getAmount(){ return this.amount;}
+	    public void setAmount(float amount){ this.amount = amount;}
+    }
 }

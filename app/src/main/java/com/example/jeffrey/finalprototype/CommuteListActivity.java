@@ -87,11 +87,11 @@ public class CommuteListActivity extends AppCompatActivity {
         }
 
         /** Uncomment these two lines to test the weather task */
-        //JSONWeatherTask task = new JSONWeatherTask();
-        //task.execute(new String[]{defaultCity});
+        JSONWeatherTask task = new JSONWeatherTask();
+        task.execute(new String[]{defaultCity});
 
         /** Uncomment this line to test a basic neural network */
-        BaseNetwork net = new BaseNetwork();
+        // BaseNetwork net = new BaseNetwork();
     }
 
     @Override
@@ -251,6 +251,7 @@ public class CommuteListActivity extends AppCompatActivity {
 
                 System.out.println("WEATHER COND: " + weather.currentCondition.getDescr());
                 System.out.println("WEATHER TEMP: " + weather.temperature.getTemp() + "F");
+                System.out.println("SNOWFALL: " + weather.snow.getAmount());
 
             } catch (JSONException e) {
                 e.printStackTrace();
