@@ -43,18 +43,12 @@
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version"/>
         </activity>
-        <activity
+        <fragment
             android:name=".PickTime"
             android:label="@string/choose_arr_time"
             android:theme="@style/AppTheme.NoActionBar">
 
-        </activity>
-        <activity
-            android:name=".PickNumber"
-            android:label="@string/choose_prep_time"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+        </fragment>
     </application>
 
 </manifest>
