@@ -31,8 +31,6 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 public class AddNewCommute extends FragmentActivity{
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    private static final int ARR_TIME_REQUEST = 1;
-    private static final int PREP_TIME_REQUEST = 2;
     private static final int PLACE_PICKER_REQUEST = 3;
     EditText editTextID;
     TextView selectedArrTime;
@@ -91,7 +89,6 @@ public class AddNewCommute extends FragmentActivity{
         prepTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                startActivityForResult(choosePrepTime, PREP_TIME_REQUEST);
                 AlertDialog.Builder mBuidler = new AlertDialog.Builder(AddNewCommute.this);
                 final View mView = getLayoutInflater().inflate(R.layout.activity_pick_number, null);
                 mBuidler.setView(mView);
@@ -144,30 +141,7 @@ public class AddNewCommute extends FragmentActivity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == ARR_TIME_REQUEST) {
-            if(resultCode == Activity.RESULT_OK){
-                int arrHour = data.getIntExtra("hour", 12);
-                int arrMin = data.getIntExtra("minute", 0);
-                String time = semanticTime(arrHour, arrMin);
-                selectedArrTime.setText(time);
-                System.out.println("Hour: " + getHourFromTime(selectedArrTime.getText().toString()));
-                System.out.println("Min: " + getMinFromTime(selectedArrTime.getText().toString()));
-
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                System.out.println("ARR_TIME ACTIVITY CANCELED");
-            }
-        } else if (requestCode == PREP_TIME_REQUEST){
-            if(resultCode == Activity.RESULT_OK){
-                int prepMins = data.getIntExtra("mins", 0);
-                int prepHours = data.getIntExtra("hours",0);
-                String time = semanticPrep(prepHours, prepMins);
-                selectedPrepTime.setText(time);
-                System.out.println("Prep Mins: " + getPrepMins(selectedPrepTime.getText().toString()));
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                System.out.println("PREP_TIME ACTIVITY CANCELED");
-            }
-        } else if (requestCode == PLACE_PICKER_REQUEST){
+        if (requestCode == PLACE_PICKER_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 final Place place = PlacePicker.getPlace(this, data);
                 final CharSequence address = place.getAddress();
