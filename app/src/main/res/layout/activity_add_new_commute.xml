@@ -46,7 +46,8 @@
         android:text="@string/choose_arr_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/chooseArrTimeButton" />
+        android:id="@+id/chooseArrTimeButton"
+        android:onClick="showTimePickerDialog" />
 
     <LinearLayout
         android:orientation="horizontal"

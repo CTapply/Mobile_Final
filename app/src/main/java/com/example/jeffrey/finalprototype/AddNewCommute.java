@@ -5,12 +5,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -24,11 +28,9 @@ import com.google.android.gms.location.places.ui.PlacePicker;
  * Created by Jeffrey on 2/16/2017.
  */
 
-public class AddNewCommute extends AppCompatActivity{
+public class AddNewCommute extends FragmentActivity{
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    private static final int ARR_TIME_REQUEST = 1;
-    private static final int PREP_TIME_REQUEST = 2;
     private static final int PLACE_PICKER_REQUEST = 3;
     EditText editTextID;
     TextView selectedArrTime;
@@ -59,8 +61,6 @@ public class AddNewCommute extends AppCompatActivity{
         final ToggleButton saturday = (ToggleButton) findViewById(R.id.saturdayButton);
         final CheckBox repeat = (CheckBox) findViewById(R.id.repeatCheckBox);
 
-        final Intent chooseArrTime = new Intent(this, PickTime.class);
-        final Intent choosePrepTime = new Intent(this, PickNumber.class);
         final Intent addCommute = new Intent(this, CommuteListActivity.class);
 
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -86,17 +86,38 @@ public class AddNewCommute extends AppCompatActivity{
 
         checkLocationPermission();
 
-        arrTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivityForResult(chooseArrTime, ARR_TIME_REQUEST);
-            }
-        });
-
         prepTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(choosePrepTime, PREP_TIME_REQUEST);
+                AlertDialog.Builder mBuidler = new AlertDialog.Builder(AddNewCommute.this);
+                final View mView = getLayoutInflater().inflate(R.layout.activity_pick_number, null);
+                mBuidler.setView(mView);
+                final AlertDialog mDialog = mBuidler.create();
+
+                // Hours
+                final NumberPicker numPickerHours = (NumberPicker) mView.findViewById(R.id.numberPickerHours);
+                numPickerHours.setMinValue(0);
+                numPickerHours.setMaxValue(24);
+                numPickerHours.setWrapSelectorWheel(false);
+
+                // Minutes
+                final NumberPicker numPickerMins = (NumberPicker) mView.findViewById(R.id.numberPickerMinutes);
+                numPickerMins.setMinValue(0);
+                numPickerMins.setMaxValue(59);
+                numPickerMins.setWrapSelectorWheel(true);
+
+                // Set Button
+                final Button pickPrepTimeButton = (Button) mView.findViewById(R.id.button2);
+                pickPrepTimeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String time = semanticPrep(numPickerHours.getValue(), numPickerMins.getValue());
+                        selectedPrepTime.setText(time);
+                        mDialog.hide();
+                    }
+                });
+
+                mDialog.show();
             }
         });
 
@@ -120,29 +141,7 @@ public class AddNewCommute extends AppCompatActivity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == ARR_TIME_REQUEST) {
-            if(resultCode == Activity.RESULT_OK){
-                int arrHour = data.getIntExtra("hour", 12);
-                int arrMin = data.getIntExtra("minute", 0);
-                String time = semanticTime(arrHour, arrMin);
-                selectedArrTime.setText(time);
-                System.out.println("Hour: " + getHourFromTime(selectedArrTime.getText().toString()));
-                System.out.println("Min: " + getMinFromTime(selectedArrTime.getText().toString()));
-
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                System.out.println("ARR_TIME ACTIVITY CANCELED");
-            }
-        } else if (requestCode == PREP_TIME_REQUEST){
-            if(resultCode == Activity.RESULT_OK){
-                int prepMins = data.getIntExtra("mins", 0);
-                String time = semanticPrep(prepMins);
-                selectedPrepTime.setText(time);
-                System.out.println("Prep Mins: " + getPrepMins(selectedPrepTime.getText().toString()));
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                System.out.println("PREP_TIME ACTIVITY CANCELED");
-            }
-        } else if (requestCode == PLACE_PICKER_REQUEST){
+        if (requestCode == PLACE_PICKER_REQUEST){
             if(resultCode == Activity.RESULT_OK){
                 final Place place = PlacePicker.getPlace(this, data);
                 final CharSequence address = place.getAddress();
@@ -152,8 +151,6 @@ public class AddNewCommute extends AppCompatActivity{
                 System.out.println("Made it to Result Canceled in Place Picker");
             }
         }
-
-        System.out.println("Made it here with request code = " + requestCode);
     }
 
     @Override
@@ -180,24 +177,33 @@ public class AddNewCommute extends AppCompatActivity{
         selectedDestination.setText(dest);
     }
 
-    public String semanticPrep(int minutes){
+    public void setArrivalTime(int hour, int min) {
+        String time = semanticTime(hour, min);
+        selectedArrTime.setText(time);
+    }
+
+    /**
+     * Returns the String value of prepTime for given hours and minutes
+     * @param hours
+     * @param minutes
+     * @return Time of prep in # hours # minutes format
+     */
+    public String semanticPrep(int hours, int minutes){
         String prepTime = "";
+        prepTime += Integer.toString(hours);
+        if (hours > 1) {
+            prepTime += " hours ";
+        } else if (hours == 1) {
+            prepTime += " hour ";
+        } else {
+            // do nothing
+        }
         prepTime += Integer.toString(minutes);
-        prepTime += " mins";
-//        if(minutes >= 60){
-//            int hours = minutes / 60;
-//            prepTime += Integer.toString(hours);
-//            if(hours == 1)
-//                prepTime += " hour ";
-//            else
-//                prepTime += " hours ";
-//        }
-//        int mins = minutes % 60;
-//        prepTime += Integer.toString(mins);
-//        if(mins == 1)
-//            prepTime += " min";
-//        else
-//            prepTime += " mins";
+        if (minutes == 1) {
+            prepTime += " minute";
+        } else {
+            prepTime += " minutes";
+        }
         return prepTime;
     }
 
@@ -236,12 +242,38 @@ public class AddNewCommute extends AppCompatActivity{
         return Integer.parseInt(minString);
     }
 
+    /**
+     * Gets the number of minutes set for preparation (Only does in minutes, so 1 hour 15 minutes = 75 minutes)
+     * @param prepString
+     * @return integer number of minutes
+     */
     public int getPrepMins(String prepString){
-        int end = prepString.length() - 5;
-        String minString = prepString.substring(0, end);
-        return Integer.parseInt(minString);
+        int minutes = 0;
+
+        String tokens[] = prepString.split(" ");
+        if (tokens.length == 4) { // Means we also have a value of hours
+            minutes += Integer.parseInt(tokens[0]) * 60; // This value is hours
+            minutes += Integer.parseInt(tokens[2]); // This value is minutes
+        } else { // Only have minutes
+            minutes += Integer.parseInt(tokens[0]);
+        }
+
+        return minutes;
     }
 
+    /**
+     * Shows the dialog pop up to choose an arrival time
+     * @param v
+     */
+    public void showTimePickerDialog(View v) {
+        DialogFragment newFragment = new PickTime();
+        newFragment.show(getSupportFragmentManager(), "TimePicker");
+    }
+
+    /**
+     * Gets the permission to use the users Location data
+     * @return boolean - If we get permission = true
+     */
     public boolean checkLocationPermission(){
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION)

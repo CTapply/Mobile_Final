@@ -191,8 +191,47 @@ public class Content {
             return destination;
         }
 
+        /**
+         * Gets the number of minutes as an integer in preparationTime
+         * @return Prep time in # hours $ minutes
+         */
         public String semanticPrepTime(){
-            return Integer.toString(this.preparationTime) + " min";
+            int minutes = this.preparationTime;
+            int hours = 0;
+            if (minutes >= 60) {
+                hours = (int) Math.floor(minutes/60);
+                minutes = minutes % 60;
+                if (hours > 1) {
+                    if (minutes == 0) {
+                        return hours + " hours";
+                    } else if (minutes == 1) {
+                        return hours + " hours " + minutes + " minute";
+                    } else {
+                        return hours + " hours " + minutes + " minutes";
+                    }
+                } else if (hours == 1) {
+                    if (minutes == 0) {
+                        return hours + " hour";
+                    } else if (minutes == 1) {
+                        return hours + " hour " + minutes + " minute";
+                    } else {
+                        return hours + " hour " + minutes + " minutes";
+                    }
+                } else { // 0 hours
+                    if (minutes == 1) {
+                        return minutes + " minute";
+                    } else {
+                        return minutes + " minutes";
+                    }
+                }
+            } else {
+                // Minutes is < 60 so we are good
+                if (minutes == 1) {
+                    return minutes + " minute";
+                } else {
+                    return minutes + " minutes";
+                }
+            }
         }
 
         public String semanticTime(){
