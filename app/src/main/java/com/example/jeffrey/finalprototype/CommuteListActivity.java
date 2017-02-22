@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.example.jeffrey.finalprototype.Content.Commute;
 import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
+import com.example.jeffrey.finalprototype.machinelearning.BaseNetwork;
 import com.example.jeffrey.finalprototype.weather.JSONWeatherParser;
 import com.example.jeffrey.finalprototype.weather.WeatherHttpClient;
 import com.example.jeffrey.finalprototype.weather.model.Weather;
@@ -85,8 +86,12 @@ public class CommuteListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
-        JSONWeatherTask task = new JSONWeatherTask();
-        task.execute(new String[]{defaultCity});
+        /** Uncomment these two lines to test the weather task */
+        //JSONWeatherTask task = new JSONWeatherTask();
+        //task.execute(new String[]{defaultCity});
+
+        /** Uncomment this line to test a basic neural network */
+        BaseNetwork net = new BaseNetwork();
     }
 
     @Override
