@@ -223,6 +223,7 @@ public class Content {
         public String timeMode;
         public int preparationTime;
         public WeeklyInfo weekInfo;
+        public boolean alarmArmed;
 
         public Commute(String id, String destination, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo) {
@@ -237,6 +238,7 @@ public class Content {
                 this.timeMode = "AM";
             }
             this.weekInfo = weekInfo;
+            this.alarmArmed = true;
             this.UUID = 0;
         }
 

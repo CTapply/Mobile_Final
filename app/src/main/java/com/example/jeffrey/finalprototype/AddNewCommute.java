@@ -74,6 +74,7 @@ public class AddNewCommute extends FragmentActivity{
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                System.out.println("editTextID.getText().toString() " + editTextID.getText().toString());
                 addCommute.putExtra("id", editTextID.getText().toString());
                 addCommute.putExtra("arr_hour", getHourFromTime(selectedArrTime.getText().toString()));
                 addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
@@ -94,6 +95,9 @@ public class AddNewCommute extends FragmentActivity{
 
         checkLocationPermission();
 
+        /**
+         * This shows the dialog box for choosing Preparation time
+         */
         prepTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,7 +125,7 @@ public class AddNewCommute extends FragmentActivity{
                     public void onClick(View view) {
                         String time = semanticPrep(numPickerHours.getValue(), numPickerMins.getValue());
                         selectedPrepTime.setText(time);
-                        mDialog.hide();
+                        mDialog.dismiss();
                     }
                 });
 

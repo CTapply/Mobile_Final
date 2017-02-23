@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 /**
@@ -64,6 +65,8 @@ public class CommuteDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.textView6)).setText(mItem.semanticPrepTime());
             ((TextView) rootView.findViewById(R.id.textView8)).setText(mItem.destination);
             ((TextView) rootView.findViewById(R.id.textView10)).setText(mItem.weekInfo.toString());
+            CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
+            alarmArmed.setChecked(mItem.alarmArmed);
         }
 
         return rootView;
