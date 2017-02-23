@@ -63,4 +63,40 @@ public class BaseNetwork {
 
         Encog.getInstance().shutdown();
     }
+
+    public float calcCoefficient(float latitude){
+        return 0.0f;
+    }
+
+    public int calcSnowDelay(int snowfall){
+        return 0;
+    }
 }
+/**
+    Calculate Snow Delay based on: inches, location
+    Calculate Prep Time based on : User_Time, Last_Prep_By_Day_of_Week, + Snow Delay
+
+    Set some form of latitude as a range;
+        > ex south carolina coefficient is 1 (most extreme)
+               : North of Maine asymptotes to something low (doesn't matter as much)
+
+                coefficient * (num_inches + 10)               c [0.25, 1.25]
+                max_delay caps at 15 minutes
+
+    training_set = {expected = 20, Monday}
+    output_set = {actual_time = 22}
+
+    prep_time = output + snow_delay
+ */
+
+/**
+    Thresh_Max = 55.7435 (Thompson, Manitoba, Canada    ~ 55
+    Thresh_Min = 19.428471 (Mexico City, Mexico)        ~ 20
+ */
+
+/**
+    Use the database to store training data about the neural network
+        : Each commute needs to keep track of its own data
+
+        : Does this mean that we re-train the network every single time???
+ */
