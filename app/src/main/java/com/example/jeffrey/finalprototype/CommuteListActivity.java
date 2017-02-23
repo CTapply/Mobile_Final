@@ -46,6 +46,7 @@ public class CommuteListActivity extends AppCompatActivity {
      */
     private boolean mTwoPane;
     private static final int NEW_COMMUTE_REQUEST = 50;
+    public static SQLiteDatabase mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,10 @@ public class CommuteListActivity extends AppCompatActivity {
             }
         });
 
+        Context mContext = getApplicationContext();
+        mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
+
+        Content.populate();
         View recyclerView = findViewById(R.id.commute_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
@@ -102,8 +107,11 @@ public class CommuteListActivity extends AppCompatActivity {
                             saturday, repeat);
 
                 Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w);
-                addItem(newCommute);
+                Context mContext = getApplicationContext();
+                SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
+                addItem(newCommute, mDatabase);
 
+                Content.populate();
                 View recyclerView = findViewById(R.id.commute_list);
                 assert recyclerView != null;
                 setupRecyclerView((RecyclerView) recyclerView);
@@ -111,7 +119,7 @@ public class CommuteListActivity extends AppCompatActivity {
         }
     }
 
-    public WeeklyInfo makeWeek(boolean su, boolean m, boolean tu, boolean w, boolean th,
+    public static WeeklyInfo makeWeek(boolean su, boolean m, boolean tu, boolean w, boolean th,
                                boolean f, boolean sa, boolean r){
         boolean[] week = new boolean[7];
         week[0] = su;
@@ -128,23 +136,12 @@ public class CommuteListActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
 
-        Context mContext = getApplicationContext();
-        SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
+
 
 //        for (Commute commute : Content.ITEMS){
 //            ContentValues values = getContentValues(commute);
 //            mDatabase.insert(CommuteTable.NAME, null, values);
 //        }
-    }
-
-    private static ContentValues getContentValues(Commute commute){
-        ContentValues values = new ContentValues();
-        values.put(CommuteTable.Cols.ID, commute.id);
-        values.put(CommuteTable.Cols.ARR_HOUR, commute.arrivalTimeHour);
-        values.put(CommuteTable.Cols.ARR_MIN, commute.arrivalTimeMin);
-        values.put(CommuteTable.Cols.PREP_MINS, commute.preparationTime);
-        values.put(CommuteTable.Cols.DESTINATION, commute.destination);
-        return values;
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {

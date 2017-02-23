@@ -1,11 +1,21 @@
 package com.example.jeffrey.finalprototype;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+
+import database.CommuteBaseHelper;
+import database.CommuteCursorWrapper;
+import database.CommuteDbSchema;
+import database.CommuteDbSchema.CommuteTable.Cols;
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -18,7 +28,7 @@ public class Content {
     /**
      * An array of sample (Commute) items.
      */
-    public static final List<Commute> ITEMS = new ArrayList<Commute>();
+    public static List<Commute> ITEMS = new ArrayList<Commute>();
 
     /**
      * A map of commutes, by ID.
@@ -32,12 +42,69 @@ public class Content {
 //        for (int i = 1; i <= COUNT; i++) {
 //            addItem(createDummyItem(i));
 //        }
-        addItem(createDummyItem(1));
+        //addItem(createDummyItem(1));
     }
 
-    public static void addItem(Commute item) {
+    public static void addItem(Commute item, SQLiteDatabase db) {
         ITEMS.add(item);
         COMMUTE_MAP.put(item.id, item);
+
+        ContentValues values = getContentValues(item);
+        db.insert(CommuteDbSchema.CommuteTable.NAME, null, values);
+    }
+
+    private static CommuteCursorWrapper queryCommutes(String whereClause, String[] whereArgs){
+        Cursor c = CommuteListActivity.mDatabase.query(
+                CommuteDbSchema.CommuteTable.NAME,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+        );
+        return new CommuteCursorWrapper(c);
+    }
+
+    private static ContentValues getContentValues(Commute commute){
+        ContentValues values = new ContentValues();
+        values.put(Cols.ID, commute.id);
+        values.put(Cols.ARR_HOUR, commute.arrivalTimeHour);
+        values.put(Cols.ARR_MIN, commute.arrivalTimeMin);
+        values.put(Cols.PREP_MINS, commute.preparationTime);
+        values.put(Cols.DESTINATION, commute.destination);
+        values.put(Cols.REPEAT, boolToInt(commute.weekInfo.repeat));
+        values.put(Cols.SUNDAY, boolToInt(commute.weekInfo.days[0]));
+        values.put(Cols.MONDAY, boolToInt(commute.weekInfo.days[1]));
+        values.put(Cols.TUESDAY, boolToInt(commute.weekInfo.days[2]));
+        values.put(Cols.WEDNESDAY, boolToInt(commute.weekInfo.days[3]));
+        values.put(Cols.THURSDAY, boolToInt(commute.weekInfo.days[4]));
+        values.put(Cols.FRIDAY, boolToInt(commute.weekInfo.days[5]));
+        values.put(Cols.SATURDAY, boolToInt(commute.weekInfo.days[6]));
+        return values;
+    }
+
+    public static int boolToInt(boolean b){
+        if(b)
+            return 1;
+        else
+            return 0;
+    }
+
+    public static void populate(){
+        // Pull records from SQLite DB and populate ITEMS
+        List<Commute> commutes = new ArrayList<>();
+        CommuteCursorWrapper cursor = queryCommutes(null, null);
+        try{
+            cursor.moveToFirst();
+            while(!cursor.isAfterLast()){
+                commutes.add(cursor.getCommute());
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+            ITEMS = commutes;
+        }
     }
 
     private static Commute createDummyItem(int position) {
@@ -64,8 +131,8 @@ public class Content {
 
         public WeeklyInfo(){
             this.days = new boolean[7];
-            for(boolean day : this.days){
-                day = false;
+            for(int i = 0; i < this.days.length; ++i){
+                this.days[i] = false;
             }
             this.repeat = false;
         }
@@ -77,10 +144,16 @@ public class Content {
         }
 
         public void setDayOn(int day){
-            this.days[day] = true;
+            if(day >= 0 && day <= 6)
+                this.days[day] = true;
+            else
+                System.out.println("SET DAY ON index out of range");
         }
         public void setDayOff(int day){
-            this.days[day] = false;
+            if(day >= 0 && day <= 6)
+                this.days[day] = false;
+            else
+                System.out.println("SET DAY OFF index out of range");
         }
         public void setRepeat(boolean val){
             this.repeat = val;
@@ -143,6 +216,7 @@ public class Content {
      */
     public static class Commute {
         public final String id;
+        public final int UUID;
         public String destination;
         public int arrivalTimeHour;
         public int arrivalTimeMin;
@@ -163,7 +237,24 @@ public class Content {
                 this.timeMode = "AM";
             }
             this.weekInfo = weekInfo;
-            System.out.println(weekInfo.toString());
+            this.UUID = 0;
+        }
+
+        public Commute(String id, String destination, int arrivalTimeHour,
+                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
+                       int uuid) {
+            this.id = id;
+            this.destination = destination;
+            this.arrivalTimeHour = arrivalTimeHour;
+            this.arrivalTimeMin = arrivalTimeMin;
+            this.preparationTime = preparationTime;
+            if(arrivalTimeHour >= 12){
+                this.timeMode = "PM";
+            } else {
+                this.timeMode = "AM";
+            }
+            this.weekInfo = weekInfo;
+            this.UUID = uuid;
         }
 
         public void setDestination(String dest){

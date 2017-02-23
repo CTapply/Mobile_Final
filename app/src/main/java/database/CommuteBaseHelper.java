@@ -12,8 +12,8 @@ import database.CommuteDbSchema.CommuteTable;
 
 public class CommuteBaseHelper extends SQLiteOpenHelper {
 
-    private static final int VERSION = 1;
-    private static final String DATABASE_NAME  = "commuteBase.db";
+    private static final int VERSION = 2;
+    private static final String DATABASE_NAME  = "commuteBaseTwo.db";
 
     public CommuteBaseHelper(Context context){
         super(context, DATABASE_NAME, null, VERSION);
@@ -27,7 +27,16 @@ public class CommuteBaseHelper extends SQLiteOpenHelper {
                 CommuteTable.Cols.ARR_HOUR + ", " +
                 CommuteTable.Cols.ARR_MIN + ", "  +
                 CommuteTable.Cols.PREP_MINS + ", " +
-                CommuteTable.Cols.DESTINATION + ")");
+                CommuteTable.Cols.DESTINATION + ", " +
+                CommuteTable.Cols.REPEAT + ", " +
+                CommuteTable.Cols.SUNDAY + ", " +
+                CommuteTable.Cols.MONDAY + ", " +
+                CommuteTable.Cols.TUESDAY + ", " +
+                CommuteTable.Cols.WEDNESDAY + ", " +
+                CommuteTable.Cols.THURSDAY + ", " +
+                CommuteTable.Cols.FRIDAY + ", " +
+                CommuteTable.Cols.SATURDAY +
+                ")");
 
     }
 
