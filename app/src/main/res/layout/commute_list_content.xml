@@ -1,20 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/id"
-        android:layout_width="wrap_content"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
+        android:gravity="center">
 
-    <TextView
-        android:id="@+id/content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem" />
-</LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:layout_weight="1"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <Switch
+                android:layout_height="wrap_content"
+                android:id="@+id/alarmSwitch"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:gravity="right|center"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginTop="-8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@android:drawable/stat_notify_sync_noanim"
+                android:id="@+id/alarmRepeat"
+                android:layout_weight="1"
+                android:tint="@android:color/darker_gray"
+                android:scaleX=".7"
+                android:scaleY=".7"
+                android:layout_marginTop="2dp" />
+
+            <TextView
+                android:text="S"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewSun"
+                android:layout_weight="1"
+                android:layout_margin="5dp" />
+            <TextView
+                android:text="M"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewMon"
+                android:layout_weight="1"
+                android:layout_margin="5dp" />
+            <TextView
+                android:text="T"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewTues"
+                android:layout_weight="1"
+                android:layout_margin="5dp" />
+            <TextView
+                android:text="W"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewWed"
+                android:layout_weight="1"
+                android:layout_margin="5dp" />
+            <TextView
+                android:text="T"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewThur"
+                android:layout_weight="1"
+                android:layout_margin="5dp" />
+            <TextView
+                android:text="F"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewFri"
+                android:layout_weight="1"
+                android:layout_margin="5dp" />
+            <TextView
+                android:text="S"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewSat"
+                android:layout_weight="1"
+                android:layout_margin="5dp" />
+        </LinearLayout>
+
+    </LinearLayout>

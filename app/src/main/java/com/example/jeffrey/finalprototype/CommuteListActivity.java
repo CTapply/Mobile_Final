@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,12 +17,15 @@ import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 
 import com.example.jeffrey.finalprototype.Content.Commute;
 import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import database.CommuteBaseHelper;
@@ -83,6 +87,7 @@ public class CommuteListActivity extends AppCompatActivity {
 
         if (requestCode == NEW_COMMUTE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
+                System.out.println("Inside of RESULT_OK for new commute request");
                 String name = data.getStringExtra("id");
                 int arrHour = data.getIntExtra("arr_hour", 12);
                 int arrMin = data.getIntExtra("arr_min", 0);
@@ -107,6 +112,9 @@ public class CommuteListActivity extends AppCompatActivity {
                 View recyclerView = findViewById(R.id.commute_list);
                 assert recyclerView != null;
                 setupRecyclerView((RecyclerView) recyclerView);
+            } else {
+                System.out.println("Inside of RESULT_NOT_OK for new commute request");
+
             }
         }
     }
@@ -151,8 +159,7 @@ public class CommuteListActivity extends AppCompatActivity {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(Content.ITEMS));
     }
 
-    public class SimpleItemRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+    public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
         private final List<Commute> mValues;
 
@@ -170,8 +177,52 @@ public class CommuteListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).destination);
+//            holder.mIdView.setText(mValues.get(position).id);
+            holder.mContentView.setText(holder.mItem.id);
+            holder.mAlarmSwitch.setChecked(holder.mItem.alarmArmed);
+            // Set the color of the Selected days of the alarm
+            if (holder.mItem.weekInfo.repeat == true) {
+                holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
+            } else {
+                holder.mAlarmRepeat.setColorFilter(Color.GRAY);
+            }
+            for (int i = 0; i < holder.mItem.weekInfo.days.length; i ++) {
+                if (holder.mItem.weekInfo.days[i]) {
+                    holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
+                } else {
+                    holder.mDayList.get(i).setTextColor(Color.GRAY);
+                }
+            }
+            holder.mAlarmSwitch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Setting the colors
+                    if (holder.mItem.weekInfo.repeat == true) {
+                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
+                    } else {
+                        holder.mAlarmRepeat.setColorFilter(Color.GRAY);
+                    }
+
+                    for (int i = 0; i < holder.mItem.weekInfo.days.length; i ++) {
+                        if (holder.mAlarmSwitch.isChecked()) {
+                            if (holder.mItem.weekInfo.days[i]) {
+                                holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
+                            } else {
+                                holder.mDayList.get(i).setTextColor(Color.GRAY);
+                            }
+                        } else {
+                            holder.mAlarmRepeat.setColorFilter(Color.LTGRAY);
+                            holder.mDayList.get(i).setTextColor(Color.LTGRAY);
+                        }
+                    }
+                    // Now we need to Set or cancel the alarm TODO
+                    if (holder.mAlarmSwitch.isChecked()) {
+                        // Set Alarm
+                    } else {
+                        // Cancel Alarm
+                    }
+                }
+            });
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -202,15 +253,35 @@ public class CommuteListActivity extends AppCompatActivity {
 
         class ViewHolder extends RecyclerView.ViewHolder {
             final View mView;
-            final TextView mIdView;
+//            final TextView mIdView;
             final TextView mContentView;
+            final Switch mAlarmSwitch;
+            final ImageView mAlarmRepeat;
+            final TextView mSunday, mMonday, mTuesday, mWednesday, mThursday, mFriday, mSaturday;
+            final LinkedList<TextView> mDayList = new LinkedList<>();
             Commute mItem;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
+//                mIdView = (TextView) view.findViewById(R.id.id);
                 mContentView = (TextView) view.findViewById(R.id.content);
+                mAlarmSwitch = (Switch) view.findViewById(R.id.alarmSwitch);
+                mAlarmRepeat = (ImageView) view.findViewById(R.id.alarmRepeat);
+                mSunday = (TextView) view.findViewById(R.id.textViewSun);
+                mMonday = (TextView) view.findViewById(R.id.textViewMon);
+                mTuesday = (TextView) view.findViewById(R.id.textViewTues);
+                mWednesday = (TextView) view.findViewById(R.id.textViewWed);
+                mThursday = (TextView) view.findViewById(R.id.textViewThur);
+                mFriday = (TextView) view.findViewById(R.id.textViewFri);
+                mSaturday = (TextView) view.findViewById(R.id.textViewSat);
+                mDayList.add(mSunday);
+                mDayList.add(mMonday);
+                mDayList.add(mTuesday);
+                mDayList.add(mWednesday);
+                mDayList.add(mThursday);
+                mDayList.add(mFriday);
+                mDayList.add(mSaturday);
             }
 
             @Override
