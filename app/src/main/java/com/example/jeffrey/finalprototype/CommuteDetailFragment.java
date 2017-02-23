@@ -67,6 +67,8 @@ public class CommuteDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.textView10)).setText(mItem.weekInfo.toString());
             CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
             alarmArmed.setChecked(mItem.alarmArmed);
+        } else {
+            System.out.println("MITEM IS NULL FUUUCCKKKK");
         }
 
         return rootView;

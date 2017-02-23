@@ -33,7 +33,7 @@ public class Content {
     /**
      * A map of commutes, by ID.
      */
-    public static final Map<String, Commute> COMMUTE_MAP = new HashMap<String, Commute>();
+    public static Map<String, Commute> COMMUTE_MAP = new HashMap<String, Commute>();
 
     private static final int COUNT = 25;
 
@@ -81,6 +81,7 @@ public class Content {
         values.put(Cols.THURSDAY, boolToInt(commute.weekInfo.days[4]));
         values.put(Cols.FRIDAY, boolToInt(commute.weekInfo.days[5]));
         values.put(Cols.SATURDAY, boolToInt(commute.weekInfo.days[6]));
+        values.put(Cols.SATURDAY, boolToInt(commute.alarmArmed));
         return values;
     }
 
@@ -93,17 +94,21 @@ public class Content {
 
     public static void populate(){
         // Pull records from SQLite DB and populate ITEMS
-        List<Commute> commutes = new ArrayList<>();
+        List<Commute> commuteList = new ArrayList<>();
+        Map<String, Commute> commuteMap = new HashMap<String, Commute>();
         CommuteCursorWrapper cursor = queryCommutes(null, null);
         try{
             cursor.moveToFirst();
             while(!cursor.isAfterLast()){
-                commutes.add(cursor.getCommute());
+                Commute com = cursor.getCommute();
+                commuteList.add(com);
+                commuteMap.put(com.id, com);
                 cursor.moveToNext();
             }
         } finally {
             cursor.close();
-            ITEMS = commutes;
+            ITEMS = commuteList;
+            COMMUTE_MAP = commuteMap;
         }
     }
 
@@ -244,7 +249,7 @@ public class Content {
 
         public Commute(String id, String destination, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
-                       int uuid) {
+                       int uuid, boolean armed) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -257,6 +262,7 @@ public class Content {
             }
             this.weekInfo = weekInfo;
             this.UUID = uuid;
+            this.alarmArmed = armed;
         }
 
         public void setDestination(String dest){
