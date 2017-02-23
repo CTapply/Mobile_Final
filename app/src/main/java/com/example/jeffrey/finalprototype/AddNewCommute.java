@@ -32,6 +32,7 @@ public class AddNewCommute extends FragmentActivity{
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final int PLACE_PICKER_REQUEST = 3;
+    AlertDialog mDialog;
     EditText editTextID;
     TextView selectedArrTime;
     TextView selectedPrepTime;
@@ -62,6 +63,13 @@ public class AddNewCommute extends FragmentActivity{
         final CheckBox repeat = (CheckBox) findViewById(R.id.repeatCheckBox);
 
         final Intent addCommute = new Intent(this, CommuteListActivity.class);
+
+        arrTimeButton.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View view) {
+                showTimePickerDialog(view);
+             }
+         });
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +104,7 @@ public class AddNewCommute extends FragmentActivity{
                 AlertDialog.Builder mBuidler = new AlertDialog.Builder(AddNewCommute.this);
                 final View mView = getLayoutInflater().inflate(R.layout.activity_pick_number, null);
                 mBuidler.setView(mView);
-                final AlertDialog mDialog = mBuidler.create();
+                mDialog = mBuidler.create();
 
                 // Hours
                 final NumberPicker numPickerHours = (NumberPicker) mView.findViewById(R.id.numberPickerHours);
@@ -141,6 +149,12 @@ public class AddNewCommute extends FragmentActivity{
                 }
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDialog.dismiss();
     }
 
     @Override
