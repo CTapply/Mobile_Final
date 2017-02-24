@@ -154,7 +154,9 @@ public class AddNewCommute extends FragmentActivity{
     @Override
     protected void onPause() {
         super.onPause();
-        mDialog.dismiss();
+        if (mDialog != null) {
+            mDialog.dismiss();
+        }
     }
 
     @Override

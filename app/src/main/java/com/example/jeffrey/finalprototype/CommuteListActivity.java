@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.jeffrey.finalprototype.Content.Commute;
@@ -28,6 +29,9 @@ import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
 import java.util.LinkedList;
 import java.util.List;
 
+import alarmManager.Alarm;
+import alarmManager.AlarmService;
+import alarmManager.AlarmServiceReceiver;
 import database.CommuteBaseHelper;
 import database.CommuteDbSchema;
 import database.CommuteDbSchema.CommuteTable;
@@ -73,7 +77,7 @@ public class CommuteListActivity extends AppCompatActivity {
         Context mContext = getApplicationContext();
         mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
 
-        Content.populate();
+        Content.populate(this);
         View recyclerView = findViewById(R.id.commute_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
@@ -85,6 +89,15 @@ public class CommuteListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+
+        callAlarmScheduleService();
+
+
+    }
+
+    protected void callAlarmScheduleService() {
+        Intent AlarmServiceIntent = new Intent(this, AlarmServiceReceiver.class);
+        sendBroadcast(AlarmServiceIntent, null);
     }
 
     @Override
@@ -111,15 +124,17 @@ public class CommuteListActivity extends AppCompatActivity {
                 WeeklyInfo w = makeWeek(sunday, monday, tuesday, wednesday, thursday, friday,
                             saturday, repeat);
 
-                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w);
+                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w, this);
                 Context mContext = getApplicationContext();
                 SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
                 addItem(newCommute, mDatabase);
 
-                Content.populate();
+                Content.populate(this);
                 View recyclerView = findViewById(R.id.commute_list);
                 assert recyclerView != null;
                 setupRecyclerView((RecyclerView) recyclerView);
+                callAlarmScheduleService();
+                Toast.makeText(CommuteListActivity.this, newCommute.getNextAlarm().getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
             } else {
                 System.out.println("Inside of RESULT_NOT_OK for new commute request");
 
@@ -173,36 +188,53 @@ public class CommuteListActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mItem = mValues.get(position);
-//            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(holder.mItem.id);
-            holder.mAlarmSwitch.setChecked(holder.mItem.alarmArmed);
+            holder.mCommute = mValues.get(position);
+            holder.mContentView.setText(holder.mCommute.id);
+            holder.mAlarmSwitch.setChecked(holder.mCommute.active);
+
             // Set the color of the Selected days of the alarm
-            if (holder.mItem.weekInfo.repeat == true) {
+            if (holder.mCommute.weekInfo.repeat == true) {
                 holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
             } else {
                 holder.mAlarmRepeat.setColorFilter(Color.GRAY);
             }
-            for (int i = 0; i < holder.mItem.weekInfo.days.length; i ++) {
-                if (holder.mItem.weekInfo.days[i]) {
+            for (int i = 0; i < holder.mCommute.weekInfo.days.length; i ++) {
+                if (holder.mCommute.weekInfo.days[i]) {
                     holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
                 } else {
                     holder.mDayList.get(i).setTextColor(Color.GRAY);
                 }
             }
+
+            // Set the alarm
+            if (holder.mAlarmSwitch.isChecked()) {
+                for (Alarm a : holder.mCommute.alarm) {
+                    if (a != null) {
+//                        a.setAlarm(getApplicationContext());
+                    }
+                }
+            }
+
             holder.mAlarmSwitch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    // Show toast and set active
+                    if (holder.mAlarmSwitch.isChecked()) {
+                        holder.mCommute.active = true;
+                    } else {
+                        holder.mCommute.active = false;
+                    }
+                    callAlarmScheduleService();
+
                     // Setting the colors
-                    if (holder.mItem.weekInfo.repeat == true) {
+                    if (holder.mCommute.weekInfo.repeat == true) {
                         holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
                     } else {
                         holder.mAlarmRepeat.setColorFilter(Color.GRAY);
                     }
-
-                    for (int i = 0; i < holder.mItem.weekInfo.days.length; i ++) {
+                    for (int i = 0; i < holder.mCommute.weekInfo.days.length; i ++) {
                         if (holder.mAlarmSwitch.isChecked()) {
-                            if (holder.mItem.weekInfo.days[i]) {
+                            if (holder.mCommute.weekInfo.days[i]) {
                                 holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
                             } else {
                                 holder.mDayList.get(i).setTextColor(Color.GRAY);
@@ -212,13 +244,20 @@ public class CommuteListActivity extends AppCompatActivity {
                             holder.mDayList.get(i).setTextColor(Color.LTGRAY);
                         }
                     }
-                    // Now we need to Set or cancel the alarm TODO
-                    if (holder.mAlarmSwitch.isChecked()) {
-                        // Set Alarm
-                    } else {
-                        // Cancel Alarm
+
+                    // Now we need to Set or cancel the alarm
+                    for (Alarm a : holder.mCommute.alarm) {
+                        if (a != null) {
+                            a.updateAlarm();
+                        }
                     }
-                }
+
+                    if (holder.mAlarmSwitch.isChecked()) {
+                        Toast.makeText(CommuteListActivity.this, holder.mCommute.getNextAlarm().getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+
+                    }
             });
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -226,7 +265,7 @@ public class CommuteListActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(CommuteDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        arguments.putString(CommuteDetailFragment.ARG_ITEM_ID, holder.mCommute.id);
                         CommuteDetailFragment fragment = new CommuteDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
@@ -235,7 +274,7 @@ public class CommuteListActivity extends AppCompatActivity {
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, CommuteDetailActivity.class);
-                        intent.putExtra(CommuteDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        intent.putExtra(CommuteDetailFragment.ARG_ITEM_ID, holder.mCommute.id);
 
                         context.startActivity(intent);
                     }
@@ -250,13 +289,12 @@ public class CommuteListActivity extends AppCompatActivity {
 
         class ViewHolder extends RecyclerView.ViewHolder {
             final View mView;
-//            final TextView mIdView;
             final TextView mContentView;
             final Switch mAlarmSwitch;
             final ImageView mAlarmRepeat;
             final TextView mSunday, mMonday, mTuesday, mWednesday, mThursday, mFriday, mSaturday;
             final LinkedList<TextView> mDayList = new LinkedList<>();
-            Commute mItem;
+            Commute mCommute;
 
             public ViewHolder(View view) {
                 super(view);
