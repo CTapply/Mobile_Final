@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">Final Prototype</string>
-    <string name="title_commute_detail">Commute Detail</string>
+    <string name="title_commute_detail">Commute Details</string>
     <string name="commute_name">Commute Name:</string>
     <string name="arr_time">Arrival Time:</string>
     <string name="prep_time">Preparation Time:</string>
     <string name="destination">Destination:</string>
     <string name="add_new_commute">Add New Commute</string>
+    <string name="edit_commute">Edit Commute</string>
+    <string name="delete_commute">Delete Commute</string>
     <string name="choose_arr_time">Choose Arrival Time</string>
     <string name="choose_prep_time">Choose Preparation Time</string>
     <string name="choose_destination">Choose Destination</string>
@@ -13,6 +15,7 @@
     <string name="days_of_week">Days of the Week:</string>
     <string name="repeat">Repeat Weekly</string>
     <string name="repetition">Repetition:</string>
+    <string name="edit">Edit</string>
     <string name="m">M</string>
     <string name="t">T</string>
     <string name="w">W</string>

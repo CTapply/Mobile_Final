@@ -46,10 +46,10 @@ public class CommuteDetailFragment extends Fragment {
             mItem = Content.COMMUTE_MAP.get(getArguments().getString(ARG_ITEM_ID));
 
             Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null && mItem != null) {
-                appBarLayout.setTitle(mItem.id);
-            }
+//            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+//            if (appBarLayout != null && mItem != null) {
+//                appBarLayout.setTitle(mItem.id);
+//            }
         }
     }
 
@@ -67,8 +67,6 @@ public class CommuteDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.textView10)).setText(mItem.weekInfo.toString());
             CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
             alarmArmed.setChecked(mItem.alarmArmed);
-        } else {
-            System.out.println("MITEM IS NULL FUUUCCKKKK");
         }
 
         return rootView;
