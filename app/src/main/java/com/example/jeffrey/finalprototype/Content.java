@@ -35,7 +35,7 @@ public class Content implements Serializable {
     /**
      * A map of commutes, by ID.
      */
-    public static final Map<String, Commute> COMMUTE_MAP = new HashMap<String, Commute>();
+    public static Map<String, Commute> COMMUTE_MAP = new HashMap<String, Commute>();
 
     private static final int COUNT = 25;
 
@@ -83,6 +83,7 @@ public class Content implements Serializable {
         values.put(Cols.THURSDAY, boolToInt(commute.weekInfo.days[4]));
         values.put(Cols.FRIDAY, boolToInt(commute.weekInfo.days[5]));
         values.put(Cols.SATURDAY, boolToInt(commute.weekInfo.days[6]));
+        values.put(Cols.ACTIVE, boolToInt(commute.active));
         return values;
     }
 
@@ -95,17 +96,21 @@ public class Content implements Serializable {
 
     public static void populate(Context c) {
         // Pull records from SQLite DB and populate ITEMS
-        List<Commute> commutes = new ArrayList<>();
+        List<Commute> commuteList = new ArrayList<>();
+        Map<String, Commute> commuteMap = new HashMap<String, Commute>();
         CommuteCursorWrapper cursor = queryCommutes(null, null);
         try{
             cursor.moveToFirst();
             while(!cursor.isAfterLast()){
-                commutes.add(cursor.getCommute(c));
+                Commute com = cursor.getCommute(c);
+                commuteList.add(com);
+                commuteMap.put(com.id, com);
                 cursor.moveToNext();
             }
         } finally {
             cursor.close();
-            ITEMS = commutes;
+            ITEMS = commuteList;
+            COMMUTE_MAP = commuteMap;
         }
     }
 
@@ -230,7 +235,7 @@ public class Content implements Serializable {
         public boolean active;
 
         public Commute(String id, String destination, int arrivalTimeHour,
-                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, Context c) {
+                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, Context c) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -244,7 +249,7 @@ public class Content implements Serializable {
             this.weekInfo = weekInfo;
             this.UUID = 0;
             this.context = c;
-            this.active = true;
+            this.active = active;
 
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
@@ -260,7 +265,7 @@ public class Content implements Serializable {
 
         public Commute(String id, String destination, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
-                       int uuid, Context c) {
+                       int uuid, boolean active, Context c) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -275,7 +280,7 @@ public class Content implements Serializable {
 
             this.UUID = uuid;
             this.context = c;
-            this.active = true;
+            this.active = active;
 
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {

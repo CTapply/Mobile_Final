@@ -37,6 +37,7 @@ public class AddNewCommute extends FragmentActivity{
     TextView selectedArrTime;
     TextView selectedPrepTime;
     TextView selectedDestination;
+    boolean editMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -64,6 +65,12 @@ public class AddNewCommute extends FragmentActivity{
 
         final Intent addCommute = new Intent(this, CommuteListActivity.class);
 
+        final Intent passedIntent = getIntent();
+        editMode = passedIntent.getBooleanExtra("EDIT_MODE", false);
+        if(editMode){
+            addButton.setText(R.string.edit_commute);
+        }
+
         arrTimeButton.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View view) {
@@ -74,22 +81,27 @@ public class AddNewCommute extends FragmentActivity{
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("editTextID.getText().toString() " + editTextID.getText().toString());
-                addCommute.putExtra("id", editTextID.getText().toString());
-                addCommute.putExtra("arr_hour", getHourFromTime(selectedArrTime.getText().toString()));
-                addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
-                addCommute.putExtra("prep_mins", getPrepMins(selectedPrepTime.getText().toString()));
-                addCommute.putExtra("destination", selectedDestination.getText().toString());
-                addCommute.putExtra("sunday", sunday.isChecked());
-                addCommute.putExtra("monday", monday.isChecked());
-                addCommute.putExtra("tuesday", tuesday.isChecked());
-                addCommute.putExtra("wednesday", wednesday.isChecked());
-                addCommute.putExtra("thursday", thursday.isChecked());
-                addCommute.putExtra("friday", friday.isChecked());
-                addCommute.putExtra("saturday", saturday.isChecked());
-                addCommute.putExtra("repeat", repeat.isChecked());
-                setResult(Activity.RESULT_OK, addCommute);
-                finish();
+                if(editMode){
+
+                } else {
+                    System.out.println("editTextID.getText().toString() " + editTextID.getText().toString());
+                    addCommute.putExtra("id", editTextID.getText().toString());
+                    addCommute.putExtra("arr_hour", getHourFromTime(selectedArrTime.getText().toString()));
+                    addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
+                    addCommute.putExtra("prep_mins", getPrepMins(selectedPrepTime.getText().toString()));
+                    addCommute.putExtra("destination", selectedDestination.getText().toString());
+                    addCommute.putExtra("sunday", sunday.isChecked());
+                    addCommute.putExtra("monday", monday.isChecked());
+                    addCommute.putExtra("tuesday", tuesday.isChecked());
+                    addCommute.putExtra("wednesday", wednesday.isChecked());
+                    addCommute.putExtra("thursday", thursday.isChecked());
+                    addCommute.putExtra("friday", friday.isChecked());
+                    addCommute.putExtra("saturday", saturday.isChecked());
+                    addCommute.putExtra("repeat", repeat.isChecked());
+                    setResult(Activity.RESULT_OK, addCommute);
+                    finish();
+                }
+
             }
         });
 
@@ -252,7 +264,11 @@ public class AddNewCommute extends FragmentActivity{
     public int getHourFromTime(String time){
         int colonPos = time.indexOf(':');
         String hourString = time.substring(0, colonPos);
-        return Integer.parseInt(hourString);
+        if (time.toUpperCase().contains("PM")) {
+            return Integer.parseInt(hourString) + 12;
+        } else {
+            return Integer.parseInt(hourString);
+        }
     }
 
     public int getMinFromTime(String time){

@@ -121,10 +121,9 @@ public class CommuteListActivity extends AppCompatActivity {
                 boolean saturday = data.getBooleanExtra("saturday", false);
                 boolean repeat = data.getBooleanExtra("repeat", false);
 
-                WeeklyInfo w = makeWeek(sunday, monday, tuesday, wednesday, thursday, friday,
-                            saturday, repeat);
+                WeeklyInfo w = makeWeek(sunday, monday, tuesday, wednesday, thursday, friday, saturday, repeat);
 
-                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w, this);
+                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w, true, this);
                 Context mContext = getApplicationContext();
                 SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
                 addItem(newCommute, mDatabase);
@@ -190,28 +189,35 @@ public class CommuteListActivity extends AppCompatActivity {
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mCommute = mValues.get(position);
             holder.mContentView.setText(holder.mCommute.id);
-            holder.mAlarmSwitch.setChecked(holder.mCommute.active);
+            if (holder.mCommute.active) {
+                holder.mAlarmSwitch.setChecked(holder.mCommute.active);
 
-            // Set the color of the Selected days of the alarm
-            if (holder.mCommute.weekInfo.repeat == true) {
-                holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
-            } else {
-                holder.mAlarmRepeat.setColorFilter(Color.GRAY);
-            }
-            for (int i = 0; i < holder.mCommute.weekInfo.days.length; i ++) {
-                if (holder.mCommute.weekInfo.days[i]) {
-                    holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
+                // Set the color of the Selected days of the alarm
+                if (holder.mCommute.weekInfo.repeat == true) {
+                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
                 } else {
-                    holder.mDayList.get(i).setTextColor(Color.GRAY);
+                    holder.mAlarmRepeat.setColorFilter(Color.GRAY);
                 }
-            }
-
-            // Set the alarm
-            if (holder.mAlarmSwitch.isChecked()) {
-                for (Alarm a : holder.mCommute.alarm) {
-                    if (a != null) {
-//                        a.setAlarm(getApplicationContext());
+                for (int i = 0; i < holder.mCommute.weekInfo.days.length; i++) {
+                    if (holder.mCommute.weekInfo.days[i]) {
+                        holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
+                    } else {
+                        holder.mDayList.get(i).setTextColor(Color.GRAY);
                     }
+                }
+
+                // Set the alarm
+                if (holder.mAlarmSwitch.isChecked()) {
+                    for (Alarm a : holder.mCommute.alarm) {
+                        if (a != null) {
+//                        a.setAlarm(getApplicationContext());
+                        }
+                    }
+                }
+            } else { // not active
+                holder.mAlarmRepeat.setColorFilter(Color.LTGRAY);
+                for (int i = 0; i < holder.mCommute.weekInfo.days.length; i++) {
+                    holder.mDayList.get(i).setTextColor(Color.LTGRAY);
                 }
             }
 

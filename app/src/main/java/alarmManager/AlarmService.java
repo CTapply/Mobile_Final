@@ -15,6 +15,7 @@ import com.example.jeffrey.finalprototype.Content;
 import com.example.jeffrey.finalprototype.R;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,7 +101,7 @@ public class AlarmService extends Service {
         }
 
         for(Alarm alarm : alarms){
-            if(alarm != null && alarm.armed)
+            if(alarm != null && alarm.armed && alarm.getAlarmTime().getTimeInMillis() > Calendar.getInstance().getTimeInMillis())
                 alarmQueue.add(alarm);
         }
         if(alarmQueue.iterator().hasNext()){

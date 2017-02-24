@@ -40,7 +40,7 @@ public class Alarm implements Serializable {
         this.arrivalMinutes = arrivalMinutes;
         this.prepTimeInMinutes = prepTimeInMinutes;
         this.day = day;
-        this.armed = false;
+        this.armed = true;
     }
 
     /**
