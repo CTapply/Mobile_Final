@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
+import alarmManager.Alarm;
 import database.CommuteBaseHelper;
 import database.CommuteCursorWrapper;
 import database.CommuteDbSchema;
@@ -23,7 +25,7 @@ import database.CommuteDbSchema.CommuteTable.Cols;
  * <p>
  * TODO: Replace all uses of this class before publishing your app.
  */
-public class Content {
+public class Content implements Serializable {
 
     /**
      * An array of sample (Commute) items.
@@ -81,7 +83,7 @@ public class Content {
         values.put(Cols.THURSDAY, boolToInt(commute.weekInfo.days[4]));
         values.put(Cols.FRIDAY, boolToInt(commute.weekInfo.days[5]));
         values.put(Cols.SATURDAY, boolToInt(commute.weekInfo.days[6]));
-        values.put(Cols.SATURDAY, boolToInt(commute.alarmArmed));
+        values.put(Cols.ACTIVE, boolToInt(commute.active));
         return values;
     }
 
@@ -92,7 +94,7 @@ public class Content {
             return 0;
     }
 
-    public static void populate(){
+    public static void populate(Context c) {
         // Pull records from SQLite DB and populate ITEMS
         List<Commute> commuteList = new ArrayList<>();
         Map<String, Commute> commuteMap = new HashMap<String, Commute>();
@@ -100,7 +102,7 @@ public class Content {
         try{
             cursor.moveToFirst();
             while(!cursor.isAfterLast()){
-                Commute com = cursor.getCommute();
+                Commute com = cursor.getCommute(c);
                 commuteList.add(com);
                 commuteMap.put(com.id, com);
                 cursor.moveToNext();
@@ -112,13 +114,13 @@ public class Content {
         }
     }
 
-    private static Commute createDummyItem(int position) {
-        return new Commute(String.valueOf(position), "Location " + position,
-                ThreadLocalRandom.current().nextInt(1, 12 + 1), // Random hour
-                ThreadLocalRandom.current().nextInt(0, 59 + 1), // Random minute
-                ThreadLocalRandom.current().nextInt(0, 15 + 1), // Random prep time
-                new WeeklyInfo()); // Empty week info
-    }
+//    private static Commute createDummyItem(int position) {
+//        return new Commute(String.valueOf(position), "Location " + position,
+//                ThreadLocalRandom.current().nextInt(1, 12 + 1), // Random hour
+//                ThreadLocalRandom.current().nextInt(0, 59 + 1), // Random minute
+//                ThreadLocalRandom.current().nextInt(0, 15 + 1), // Random prep time
+//                new WeeklyInfo(), ); // Empty week info
+//    }
 
     private static String makeDetails(int position) {
         StringBuilder builder = new StringBuilder();
@@ -129,7 +131,7 @@ public class Content {
         return builder.toString();
     }
 
-    public static class WeeklyInfo {
+    public static class WeeklyInfo implements Serializable {
 
         public boolean[] days;
         public boolean repeat;
@@ -219,7 +221,7 @@ public class Content {
     /**
      * A commute to set alarms for
      */
-    public static class Commute {
+    public static class Commute implements Serializable {
         public final String id;
         public final int UUID;
         public String destination;
@@ -228,10 +230,12 @@ public class Content {
         public String timeMode;
         public int preparationTime;
         public WeeklyInfo weekInfo;
-        public boolean alarmArmed;
+        public Alarm[] alarm = new Alarm[7];
+        public Context context;
+        public boolean active;
 
         public Commute(String id, String destination, int arrivalTimeHour,
-                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo) {
+                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, Context c) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -243,13 +247,25 @@ public class Content {
                 this.timeMode = "AM";
             }
             this.weekInfo = weekInfo;
-            this.alarmArmed = true;
             this.UUID = 0;
+            this.context = c;
+            this.active = active;
+
+            // Set an alarm for each day of the
+            for (int i = 0; i < this.weekInfo.days.length; i++) {
+                if (this.weekInfo.days[i] == true) {
+                    this.alarm[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i);
+                    this.alarm[i].setCommute(this);
+                    this.alarm[i].setAlarmTime(c);
+                }
+
+            }
+
         }
 
         public Commute(String id, String destination, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
-                       int uuid, boolean armed) {
+                       int uuid, boolean active, Context c) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -261,8 +277,44 @@ public class Content {
                 this.timeMode = "AM";
             }
             this.weekInfo = weekInfo;
+
             this.UUID = uuid;
-            this.alarmArmed = armed;
+            this.context = c;
+            this.active = active;
+
+            // Set an alarm for each day of the
+            for (int i = 0; i < this.weekInfo.days.length; i++) {
+                if (this.weekInfo.days[i] == true) {
+                    this.alarm[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i);
+                    this.alarm[i].setCommute(this);
+                    this.alarm[i].setAlarmTime(c);
+                }
+
+            }
+        }
+
+        /**
+         * Gets the alarm that is nearest in the future for this commute
+         * @return
+         */
+        public Alarm getNextAlarm() {
+            Alarm next = new Alarm();
+            for (Alarm a : alarm) {
+                if (a != null) {
+                    next = a;
+                    break;
+                }
+            }
+            for (Alarm a : alarm) {
+                if (a != null) {
+                    if (next.getAlarmTime().getTimeInMillis() > a.getAlarmTime().getTimeInMillis()) {
+                        next = a;
+                    }
+
+
+                }
+            }
+            return next;
         }
 
         public void setDestination(String dest){

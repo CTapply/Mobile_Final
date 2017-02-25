@@ -1,5 +1,6 @@
 package database;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
@@ -18,7 +19,7 @@ public class CommuteCursorWrapper extends CursorWrapper {
         super(cursor);
     }
 
-    public Commute getCommute(){
+    public Commute getCommute(Context context){
         int uuid = getInt(getColumnIndex("_id"));
         String id = getString(getColumnIndex(CommuteTable.Cols.ID));
         int arr_hour = getInt(getColumnIndex(CommuteTable.Cols.ARR_HOUR));
@@ -33,13 +34,13 @@ public class CommuteCursorWrapper extends CursorWrapper {
         boolean thursday = getInt(getColumnIndex(CommuteTable.Cols.THURSDAY)) > 0;
         boolean friday = getInt(getColumnIndex(CommuteTable.Cols.FRIDAY)) > 0;
         boolean saturday = getInt(getColumnIndex(CommuteTable.Cols.SATURDAY)) > 0;
-        boolean armed = getInt(getColumnIndex(CommuteTable.Cols.ARMED)) > 0;
+        boolean active = getInt(getColumnIndex(CommuteTable.Cols.ACTIVE)) > 0;
 
         Content.WeeklyInfo w = CommuteListActivity.makeWeek(
                 sunday, monday, tuesday, wednesday, thursday,
                 friday, saturday, repeat
         );
-        Commute c = new Commute(id, destination, arr_hour, arr_min, prep_mins, w, uuid, armed);
+        Commute c = new Commute(id, destination, arr_hour, arr_min, prep_mins, w, uuid, active, context);
 
         return c;
     }

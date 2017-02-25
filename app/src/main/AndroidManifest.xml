@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.jeffrey.finalprototype">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -15,6 +18,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB3PCWTVRZdy9dqTxI-cZ8gbV1cx29Dafk"/>
+
         <activity
             android:name=".CommuteListActivity"
             android:label="@string/app_name"
@@ -25,6 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".CommuteDetailActivity"
             android:label="@string/title_commute_detail"
@@ -34,6 +39,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.jeffrey.finalprototype.CommuteListActivity" />
         </activity>
+
         <activity
             android:name=".AddNewCommute"
             android:label="@string/add_new_commute"
@@ -43,16 +49,34 @@
                 android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version"/>
         </activity>
+
+        <service
+            android:name="alarmManager.AlarmService"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            >
+        </service>
+        <receiver android:name="alarmManager.AlarmServiceReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name="alarmManager.AlarmAlertActivity"
+            android:label="@string/alarm"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <receiver android:name="alarmManager.AlarmAlertBroadcastReceiver" >
+        </receiver>
+
         <fragment
             android:name=".PickTime"
             android:label="@string/choose_arr_time"
             android:theme="@style/AppTheme.NoActionBar">
 
         </fragment>
-        <service
-            android:name=".AlarmService"
-            android:enabled="true" />
-        <receiver android:name=".AlarmReceiver" />
+
     </application>
 
 </manifest>

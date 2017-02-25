@@ -166,8 +166,9 @@ public class AddNewCommute extends FragmentActivity{
     @Override
     protected void onPause() {
         super.onPause();
-        if(mDialog != null)
+        if (mDialog != null) {
             mDialog.dismiss();
+        }
     }
 
     @Override
@@ -263,7 +264,11 @@ public class AddNewCommute extends FragmentActivity{
     public int getHourFromTime(String time){
         int colonPos = time.indexOf(':');
         String hourString = time.substring(0, colonPos);
-        return Integer.parseInt(hourString);
+        if (time.toUpperCase().contains("PM")) {
+            return Integer.parseInt(hourString) + 12;
+        } else {
+            return Integer.parseInt(hourString);
+        }
     }
 
     public int getMinFromTime(String time){
