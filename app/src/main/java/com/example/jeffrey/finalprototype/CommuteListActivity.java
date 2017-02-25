@@ -171,6 +171,7 @@ public class CommuteListActivity extends AppCompatActivity {
     }
 
     public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+        private int i = 0;
 
         private final List<Commute> mValues;
 
@@ -182,6 +183,12 @@ public class CommuteListActivity extends AppCompatActivity {
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.commute_list_content, parent, false);
+            if (i%2==0) {
+                view.findViewById(R.id.layoutBackground).setBackgroundColor(Color.parseColor("#E1F5FE")); // Light
+            } else {
+                view.findViewById(R.id.layoutBackground).setBackgroundColor(Color.parseColor("#B3E5FC")); // Dark
+            }
+            i++; // For swapping of colors in the list
             return new ViewHolder(view);
         }
 
