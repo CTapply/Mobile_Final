@@ -11,6 +11,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import database.CommuteDbSchema;
+
+import static com.example.jeffrey.finalprototype.CommuteListActivity.mDatabase;
+import static database.CommuteDbSchema.*;
 
 /**
  * A fragment representing a single Commute detail screen.
@@ -70,6 +76,22 @@ public class CommuteDetailFragment extends Fragment {
             CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
             alarmArmed.setChecked(mItem.active);
 
+            Button deleteButton  = (Button) rootView.findViewById(R.id.deleteButton);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String uuidString = Integer.toString(mItem.UUID);
+                    if(mDatabase.delete(CommuteTable.NAME, "_id=" + uuidString, null) > 0){
+                        Toast.makeText(getActivity(), "Commute Successfully Deleted",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), "Could Not Delete Commute",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    Intent deleteCommuteIntent = new Intent(getActivity(), CommuteListActivity.class);
+                    startActivity(deleteCommuteIntent);
+                }
+            });
 
             Button editButton  = (Button) rootView.findViewById(R.id.editButton);
             editButton.setOnClickListener(new View.OnClickListener() {
