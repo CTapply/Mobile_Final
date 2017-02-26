@@ -28,19 +28,20 @@ public class Alarm implements Serializable {
     public int arrivalHour;
     private int arrivalMinutes;
     private int prepTimeInMinutes;
-    private Calendar departTime = Calendar.getInstance();
-    private Calendar wakeUpTime = Calendar.getInstance();
+    public Calendar departTime = Calendar.getInstance();
+    public Calendar wakeUpTime = Calendar.getInstance();
     private int day;
+    public boolean repeat;
 
     public boolean armed;
     private transient Commute commute;
 
-    public Alarm(int arrivalHour, int arrivalMinutes, int prepTimeInMinutes, int day) {
+    public Alarm(int arrivalHour, int arrivalMinutes, int prepTimeInMinutes, int day, boolean armed) {
         this.arrivalHour = arrivalHour;
         this.arrivalMinutes = arrivalMinutes;
         this.prepTimeInMinutes = prepTimeInMinutes;
         this.day = day;
-        this.armed = true;
+        this.armed = armed;
     }
 
     /**
@@ -50,6 +51,7 @@ public class Alarm implements Serializable {
 
     public void setCommute(Commute c) {
         commute = c;
+        this.repeat = c.weekInfo.repeat;
     }
 
     public Calendar getAlarmTime() {
@@ -63,14 +65,9 @@ public class Alarm implements Serializable {
     public void setAlarmTime(Context context) {
         System.out.println("Inside of setAlarm");
 
-//        alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-//        Intent intent = new Intent(context, AlarmReceiver.class);
-//        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-//
-//        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60 * 1000, alarmIntent);
-
         // TODO: We need to do the calculation for when alarms are set and use as 2nd parameter
         //Currently setting the alarm to the time they need to be at work PLEASE CHANGE
+
         wakeUpTime.set(Calendar.DAY_OF_WEEK, day+1); // +1 here because Calendar.SUNDAY = 1, not 0
         wakeUpTime.set(Calendar.HOUR_OF_DAY, arrivalHour);
         wakeUpTime.set(Calendar.MINUTE, arrivalMinutes);
@@ -128,6 +125,14 @@ public class Alarm implements Serializable {
      * This will turn on/off both the wake up and the departure alarms
      */
     public void updateAlarm() {
+
+
+        if (this.getAlarmTime().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
+            // In here means this alarm is in the past but needs to be repeated so we can just add 1 week to the alarm
+            this.wakeUpTime.add(Calendar.WEEK_OF_YEAR, 1);
+        }
+
+
 //        if (commute.alarmArmed) { // We need to change to OFF
 //            commute.alarmArmed = false;
 //            alarmManager.cancel(pendingIntent);
