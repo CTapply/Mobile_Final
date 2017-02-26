@@ -133,7 +133,9 @@ public class CommuteListActivity extends AppCompatActivity {
                 assert recyclerView != null;
                 setupRecyclerView((RecyclerView) recyclerView);
                 callAlarmScheduleService();
-                Toast.makeText(CommuteListActivity.this, newCommute.getNextAlarm().getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
+                if (newCommute.getNextAlarm() != null) {
+                    Toast.makeText(CommuteListActivity.this, newCommute.getNextAlarm().getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
+                }
             } else {
                 System.out.println("Inside of RESULT_NOT_OK for new commute request");
 
@@ -195,78 +197,97 @@ public class CommuteListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mCommute = mValues.get(position);
+
+            // Set as inactive if there is no alarm that exists in the future and is not repeating
+            if (holder.mCommute.getNextAlarm() == null) {
+                holder.mCommute.disarmAlarms();
+            }
+
+            // Sets the name of the Commute in the list
             holder.mContentView.setText(holder.mCommute.id);
+
+            //If the commute is active, we then set the colors and Switch as active
             if (holder.mCommute.active) {
-                holder.mAlarmSwitch.setChecked(holder.mCommute.active);
+                holder.mAlarmSwitch.setChecked(true);
 
                 // Set the color of the Selected days of the alarm
                 if (holder.mCommute.weekInfo.repeat == true) {
-                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
+                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081")); // Pink
                 } else {
-                    holder.mAlarmRepeat.setColorFilter(Color.GRAY);
+                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
                 }
                 for (int i = 0; i < holder.mCommute.weekInfo.days.length; i++) {
                     if (holder.mCommute.weekInfo.days[i]) {
-                        holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
+                        holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));// Pink
                     } else {
-                        holder.mDayList.get(i).setTextColor(Color.GRAY);
+                        holder.mDayList.get(i).setTextColor(Color.parseColor("#757575")); // Dark gray
                     }
                 }
 
-                // Set the alarm
-                if (holder.mAlarmSwitch.isChecked()) {
-                    for (Alarm a : holder.mCommute.alarm) {
-                        if (a != null) {
-//                        a.setAlarm(getApplicationContext());
-                        }
-                    }
-                }
+//                // Set the alarm
+//                if (holder.mAlarmSwitch.isChecked()) {
+//                    for (Alarm a : holder.mCommute.alarm) {
+//                        if (a != null) {
+////                        a.setAlarm(getApplicationContext());
+//                        }
+//                    }
+//                }
             } else { // not active
-                holder.mAlarmRepeat.setColorFilter(Color.LTGRAY);
+                holder.mAlarmSwitch.setChecked(false);
+                holder.mAlarmRepeat.setColorFilter(Color.parseColor("#BDBDBD"));// Light gray
                 for (int i = 0; i < holder.mCommute.weekInfo.days.length; i++) {
-                    holder.mDayList.get(i).setTextColor(Color.LTGRAY);
+                    holder.mDayList.get(i).setTextColor(Color.parseColor("#BDBDBD"));// Light gray
                 }
             }
+            // Tell the service to check for the next alarm again in case its changed
+            callAlarmScheduleService();
 
             holder.mAlarmSwitch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // Show toast and set active
+
+                    // Set the alarm as active/inactive
                     if (holder.mAlarmSwitch.isChecked()) {
-                        holder.mCommute.active = true;
+                        holder.mCommute.activateAlarms();
+
+                        // TODO We probably want to update the DB here (Though it could be very slow, if its a problem we can find another spot)
                     } else {
-                        holder.mCommute.active = false;
+                        holder.mCommute.disarmAlarms();
+
+                        // TODO We probably want to update the DB here (Though it could be very slow, if its a problem we can find another spot)
                     }
+
+                    // Call the service
                     callAlarmScheduleService();
 
                     // Setting the colors
                     if (holder.mCommute.weekInfo.repeat == true) {
-                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));
+                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));// Pink
                     } else {
-                        holder.mAlarmRepeat.setColorFilter(Color.GRAY);
+                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
                     }
                     for (int i = 0; i < holder.mCommute.weekInfo.days.length; i ++) {
                         if (holder.mAlarmSwitch.isChecked()) {
                             if (holder.mCommute.weekInfo.days[i]) {
-                                holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));
+                                holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));// Pink
                             } else {
-                                holder.mDayList.get(i).setTextColor(Color.GRAY);
+                                holder.mDayList.get(i).setTextColor(Color.parseColor("#757575")); // Dark gray
                             }
                         } else {
-                            holder.mAlarmRepeat.setColorFilter(Color.LTGRAY);
-                            holder.mDayList.get(i).setTextColor(Color.LTGRAY);
+                            holder.mAlarmRepeat.setColorFilter(Color.parseColor("#BDBDBD")); // Light gray
+                            holder.mDayList.get(i).setTextColor(Color.parseColor("#BDBDBD")); // Light gray
                         }
                     }
 
-                    // Now we need to Set or cancel the alarm
-                    for (Alarm a : holder.mCommute.alarm) {
-                        if (a != null) {
-                            a.updateAlarm();
-                        }
-                    }
-
+                    // Show the toast
                     if (holder.mAlarmSwitch.isChecked()) {
-                        Toast.makeText(CommuteListActivity.this, holder.mCommute.getNextAlarm().getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
+                        if (holder.mCommute.getNextAlarm() != null) {
+                            Toast.makeText(CommuteListActivity.this, holder.mCommute.getNextAlarm().getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
+                        } else {
+                            // Probably wont ever get here now but just in case
+                            // (if alarm is in the past we move it 1 week ahead by the activateAlarm then UpdateAlarm calls)
+                            Toast.makeText(CommuteListActivity.this, "Cannot set alarm for a time in the past", Toast.LENGTH_LONG).show();
+                        }
                     }
 
 

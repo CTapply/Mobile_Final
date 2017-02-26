@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,14 +114,6 @@ public class Content implements Serializable {
             COMMUTE_MAP = commuteMap;
         }
     }
-
-//    private static Commute createDummyItem(int position) {
-//        return new Commute(String.valueOf(position), "Location " + position,
-//                ThreadLocalRandom.current().nextInt(1, 12 + 1), // Random hour
-//                ThreadLocalRandom.current().nextInt(0, 59 + 1), // Random minute
-//                ThreadLocalRandom.current().nextInt(0, 15 + 1), // Random prep time
-//                new WeeklyInfo(), ); // Empty week info
-//    }
 
     private static String makeDetails(int position) {
         StringBuilder builder = new StringBuilder();
@@ -230,7 +223,7 @@ public class Content implements Serializable {
         public String timeMode;
         public int preparationTime;
         public WeeklyInfo weekInfo;
-        public Alarm[] alarm = new Alarm[7];
+        public Alarm[] alarms = new Alarm[7];
         public Context context;
         public boolean active;
 
@@ -251,15 +244,21 @@ public class Content implements Serializable {
             this.context = c;
             this.active = active;
 
+
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
                 if (this.weekInfo.days[i] == true) {
-                    this.alarm[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i);
-                    this.alarm[i].setCommute(this);
-                    this.alarm[i].setAlarmTime(c);
+                    this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active);
+                    this.alarms[i].setCommute(this);
+                    this.alarms[i].setAlarmTime(c);
                 }
 
             }
+
+            // Sets the week to be the next if the day is before the day of creation,
+            // Only in this constructor so it doesn't happen when loading from Database
+            this.activateAlarms();
+
 
         }
 
@@ -285,11 +284,39 @@ public class Content implements Serializable {
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
                 if (this.weekInfo.days[i] == true) {
-                    this.alarm[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i);
-                    this.alarm[i].setCommute(this);
-                    this.alarm[i].setAlarmTime(c);
+                    this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active);
+                    this.alarms[i].setCommute(this);
+                    this.alarms[i].setAlarmTime(c);
                 }
 
+            }
+            if (this.active) {
+                this.activateAlarms();
+            }
+        }
+
+        /**
+         * Disables the alarms for this commute
+         */
+        public void disarmAlarms() {
+            this.active = false;
+            for (Alarm a : alarms) {
+                if (a != null) {
+                    a.armed = false;
+                }
+            }
+        }
+
+        /**
+         * Disables the alarms for this commute
+         */
+        public void activateAlarms() {
+            this.active = true;
+            for (Alarm a : alarms) {
+                if (a != null) {
+                    a.armed = true;
+                    a.updateAlarm();
+                }
             }
         }
 
@@ -298,14 +325,24 @@ public class Content implements Serializable {
          * @return
          */
         public Alarm getNextAlarm() {
-            Alarm next = new Alarm();
-            for (Alarm a : alarm) {
-                if (a != null) {
-                    next = a;
+            Alarm next = null;
+            for (Alarm a : alarms) {
+                if (a != null && a.repeat && a.armed && a.getAlarmTime().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
+                    // In here means this alarm is in the past but needs to be repeated so we can just add 1 week to the alarm
+                    a.wakeUpTime.add(Calendar.WEEK_OF_YEAR, 1);
+                }
+                if (a != null && a.getAlarmTime().getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+                    next = a; // Found an alarm in the future
                     break;
                 }
             }
-            for (Alarm a : alarm) {
+             // If we are still null then no alarms are in the future
+            if (next == null) {
+                return null;
+            }
+
+            // Find the alarm that is next in the future
+            for (Alarm a : alarms) {
                 if (a != null) {
                     if (next.getAlarmTime().getTimeInMillis() > a.getAlarmTime().getTimeInMillis()) {
                         next = a;

@@ -26,55 +26,6 @@ import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
 
 public class AlarmService extends Service {
 
-
-//    Alarm alarm = new Alarm();
-//
-//    public void onCreate() {
-//        super.onCreate();
-//    }
-//
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-//        alarm.setAlarm(this);
-//        return START_STICKY;
-//    }
-//
-//    @Override
-//    public void onStart(Intent intent, int startId) {
-//        alarm.setAlarm(this);
-//    }
-
-
-//    private NotificationManager alarmNotificationManager;
-//
-//    public AlarmService() {
-//        super("AlarmService");
-//    }
-//
-//    @Override
-//    public void onHandleIntent(Intent intent) {
-//        sendNotification("Wake Up! Wake Up!");
-//    }
-//
-//    private void sendNotification(String msg) {
-//        Log.d("AlarmService", "Preparing to send notification...: " + msg);
-//        alarmNotificationManager = (NotificationManager) this
-//                .getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-//                new Intent(this, AlarmActivity.class), 0);
-//
-//        NotificationCompat.Builder alamNotificationBuilder = new NotificationCompat.Builder(
-//                this).setContentTitle("Alarm").setSmallIcon(R.mipmap.ic_launcher)
-//                .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-//                .setContentText(msg);
-//
-//
-//        alamNotificationBuilder.setContentIntent(contentIntent);
-//        alarmNotificationManager.notify(1, alamNotificationBuilder.build());
-//        Log.d("AlarmService", "Notification sent.");
-//    }
-
     /**
      * Gets the next Alarm that is active and will go off out of all alarms
      * @return
@@ -97,10 +48,14 @@ public class AlarmService extends Service {
         List<Alarm> alarms = new LinkedList<>();
         System.out.println(COMMUTE_MAP.values());
         for (Content.Commute c :COMMUTE_MAP.values()) {
-            alarms.addAll(Arrays.asList(c.alarm));
+            alarms.addAll(Arrays.asList(c.alarms));
         }
 
         for(Alarm alarm : alarms){
+            if (alarm != null && alarm.repeat && alarm.armed && alarm.getAlarmTime().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
+                // In here means this alarm is in the past but needs to be repeated so we can just add 1 week to the alarm
+                alarm.wakeUpTime.add(Calendar.WEEK_OF_YEAR, 1);
+            }
             if(alarm != null && alarm.armed && alarm.getAlarmTime().getTimeInMillis() > Calendar.getInstance().getTimeInMillis())
                 alarmQueue.add(alarm);
         }
