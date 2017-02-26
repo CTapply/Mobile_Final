@@ -18,7 +18,10 @@ import alarmManager.Alarm;
 import database.CommuteBaseHelper;
 import database.CommuteCursorWrapper;
 import database.CommuteDbSchema;
+import database.CommuteDbSchema.CommuteTable;
 import database.CommuteDbSchema.CommuteTable.Cols;
+
+import static com.example.jeffrey.finalprototype.CommuteListActivity.mDatabase;
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -53,12 +56,12 @@ public class Content implements Serializable {
         COMMUTE_MAP.put(item.id, item);
 
         ContentValues values = getContentValues(item);
-        db.insert(CommuteDbSchema.CommuteTable.NAME, null, values);
+        db.insert(CommuteTable.NAME, null, values);
     }
 
     private static CommuteCursorWrapper queryCommutes(String whereClause, String[] whereArgs){
-        Cursor c = CommuteListActivity.mDatabase.query(
-                CommuteDbSchema.CommuteTable.NAME,
+        Cursor c = mDatabase.query(
+                CommuteTable.NAME,
                 null,
                 whereClause,
                 whereArgs,
@@ -288,11 +291,21 @@ public class Content implements Serializable {
                     this.alarms[i].setCommute(this);
                     this.alarms[i].setAlarmTime(c);
                 }
-
             }
             if (this.active) {
                 this.activateAlarms();
             }
+        }
+
+        public void updateCommute(){
+            String uuidString = Integer.toString(this.UUID);
+            ContentValues vals = getContentValues(this);
+            mDatabase.update(
+                    CommuteTable.NAME,
+                    vals,
+                    "_id = ?",
+                    new String[] { uuidString }
+            );
         }
 
         /**
@@ -300,6 +313,7 @@ public class Content implements Serializable {
          */
         public void disarmAlarms() {
             this.active = false;
+            updateCommute();
             for (Alarm a : alarms) {
                 if (a != null) {
                     a.armed = false;
@@ -312,6 +326,7 @@ public class Content implements Serializable {
          */
         public void activateAlarms() {
             this.active = true;
+            updateCommute();
             for (Alarm a : alarms) {
                 if (a != null) {
                     a.armed = true;
