@@ -21,15 +21,6 @@
             android:layout_weight="1"
             android:paddingLeft="5dp" />
 
-        <Button
-            android:text="@string/edit"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/button"
-            android:padding="5dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:textAlignment="textEnd" />
     </LinearLayout>
 
     <TextView
@@ -38,7 +29,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-        android:paddingLeft="10dp" />
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -54,15 +47,6 @@
             android:layout_weight="1"
             android:paddingLeft="5dp" />
 
-        <Button
-            android:text="@string/edit"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/button2"
-            android:padding="5dp"
-            android:layout_weight="0.54"
-            android:background="@android:color/transparent"
-            android:textAlignment="textEnd"/>
     </LinearLayout>
 
     <TextView
@@ -71,7 +55,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView4"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-        android:paddingLeft="10dp" />
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -87,15 +73,6 @@
             android:layout_weight="1"
             android:paddingLeft="5dp" />
 
-        <Button
-            android:text="@string/edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button3"
-            android:padding="5dp"
-            android:layout_weight="1.17"
-            android:background="@android:color/transparent"
-            android:textAlignment="textEnd"/>
     </LinearLayout>
 
     <TextView
@@ -104,7 +81,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView6"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-        android:paddingLeft="10dp" />
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -120,15 +99,6 @@
             android:layout_weight="1"
             android:paddingLeft="5dp" />
 
-        <Button
-            android:text="@string/edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button4"
-            android:padding="5dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:textAlignment="textEnd"/>
     </LinearLayout>
 
     <TextView
@@ -137,7 +107,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView8"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-        android:paddingLeft="10dp" />
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -153,15 +125,6 @@
             android:layout_weight="1"
             android:paddingLeft="5dp" />
 
-        <Button
-            android:text="@string/edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button5"
-            android:padding="5dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:textAlignment="textEnd"/>
     </LinearLayout>
 
     <TextView
@@ -170,7 +133,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView10"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-        android:paddingLeft="10dp" />
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
     <CheckBox
         android:text="Alarm Active"
@@ -182,11 +147,19 @@
         android:layout_marginTop="10dp" />
 
     <Button
+        android:text="@string/edit_commute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="20dp" />
+
+    <Button
         android:text="@string/delete_commute"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/button6"
         android:background="@android:color/holo_red_dark"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="10dp" />
 
 </LinearLayout>

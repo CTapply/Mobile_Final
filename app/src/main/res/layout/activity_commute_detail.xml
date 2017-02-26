@@ -64,7 +64,7 @@
         android:padding="5dp"
         android:id="@+id/commute_detail_container"
         android:clipToPadding="false"
-        android:layout_gravity="start">
+        android:layout_gravity="bottom">
 
     </android.support.v4.widget.NestedScrollView>
 

@@ -13,7 +13,7 @@ import database.CommuteDbSchema.CommuteTable;
 public class CommuteBaseHelper extends SQLiteOpenHelper {
 
     private static final int VERSION = 2;
-    private static final String DATABASE_NAME  = "commuteBaseThree.db";
+    private static final String DATABASE_NAME  = "commuteBaseFour.db";
 
     public CommuteBaseHelper(Context context){
         super(context, DATABASE_NAME, null, VERSION);
