@@ -223,7 +223,9 @@ public class Content implements Serializable {
         public String timeMode;
         public int preparationTime;
         public WeeklyInfo weekInfo;
-        public Alarm[] alarms = new Alarm[7];
+        // Alarms [0] - [6] are Wake up alarms
+        //        [7] - [13] are Depart alarms ( i%7 = day )
+        public Alarm[] alarms = new Alarm[14];
         public Context context;
         public boolean active;
 
@@ -248,9 +250,15 @@ public class Content implements Serializable {
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
                 if (this.weekInfo.days[i] == true) {
+                    // Wake up alarms
                     this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active);
                     this.alarms[i].setCommute(this);
                     this.alarms[i].setAlarmTime(c);
+
+                    // Depart Alarms
+                    this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active);
+                    this.alarms[i+7].setCommute(this);
+                    this.alarms[i+7].setAlarmTime(c);
                 }
 
             }
@@ -284,9 +292,15 @@ public class Content implements Serializable {
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
                 if (this.weekInfo.days[i] == true) {
+                    // Wake up alarms
                     this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active);
                     this.alarms[i].setCommute(this);
                     this.alarms[i].setAlarmTime(c);
+
+                    // Depart Alarms
+                    this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active);
+                    this.alarms[i+7].setCommute(this);
+                    this.alarms[i+7].setAlarmTime(c);
                 }
 
             }
@@ -329,7 +343,7 @@ public class Content implements Serializable {
             for (Alarm a : alarms) {
                 if (a != null && a.repeat && a.armed && a.getAlarmTime().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
                     // In here means this alarm is in the past but needs to be repeated so we can just add 1 week to the alarm
-                    a.wakeUpTime.add(Calendar.WEEK_OF_YEAR, 1);
+                    a.getAlarmTime().add(Calendar.WEEK_OF_YEAR, 1);
                 }
                 if (a != null && a.getAlarmTime().getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
                     next = a; // Found an alarm in the future

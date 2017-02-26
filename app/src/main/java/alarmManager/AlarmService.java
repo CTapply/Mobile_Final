@@ -54,7 +54,7 @@ public class AlarmService extends Service {
         for(Alarm alarm : alarms){
             if (alarm != null && alarm.repeat && alarm.armed && alarm.getAlarmTime().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
                 // In here means this alarm is in the past but needs to be repeated so we can just add 1 week to the alarm
-                alarm.wakeUpTime.add(Calendar.WEEK_OF_YEAR, 1);
+                alarm.getAlarmTime().add(Calendar.WEEK_OF_YEAR, 1);
             }
             if(alarm != null && alarm.armed && alarm.getAlarmTime().getTimeInMillis() > Calendar.getInstance().getTimeInMillis())
                 alarmQueue.add(alarm);

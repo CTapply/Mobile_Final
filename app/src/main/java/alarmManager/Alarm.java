@@ -28,19 +28,20 @@ public class Alarm implements Serializable {
     public int arrivalHour;
     private int arrivalMinutes;
     private int prepTimeInMinutes;
-    public Calendar departTime = Calendar.getInstance();
-    public Calendar wakeUpTime = Calendar.getInstance();
+    public Calendar alarmTime = Calendar.getInstance();
     private int day;
+    private int type; // Saving type, if >= 7, then depart alarm, < 7 is wake up
     public boolean repeat;
 
     public boolean armed;
     private transient Commute commute;
 
-    public Alarm(int arrivalHour, int arrivalMinutes, int prepTimeInMinutes, int day, boolean armed) {
+    public Alarm(int arrivalHour, int arrivalMinutes, int prepTimeInMinutes, int type, boolean armed) {
         this.arrivalHour = arrivalHour;
         this.arrivalMinutes = arrivalMinutes;
         this.prepTimeInMinutes = prepTimeInMinutes;
-        this.day = day;
+        this.day = type%7;
+        this.type = type;
         this.armed = armed;
     }
 
@@ -55,7 +56,7 @@ public class Alarm implements Serializable {
     }
 
     public Calendar getAlarmTime() {
-        return wakeUpTime;
+        return alarmTime;
     }
 
 
@@ -68,17 +69,32 @@ public class Alarm implements Serializable {
         // TODO: We need to do the calculation for when alarms are set and use as 2nd parameter
         //Currently setting the alarm to the time they need to be at work PLEASE CHANGE
 
-        wakeUpTime.set(Calendar.DAY_OF_WEEK, day+1); // +1 here because Calendar.SUNDAY = 1, not 0
-        wakeUpTime.set(Calendar.HOUR_OF_DAY, arrivalHour);
-        wakeUpTime.set(Calendar.MINUTE, arrivalMinutes);
-        wakeUpTime.set(Calendar.SECOND, 0);
+        // ASSUME 20 MINUTE TRAVEL TIME FOR NOW
+        int travelTime = 20;
 
-//        departTime.set(Calendar.DAY_OF_WEEK, day+1); // +1 here because Calendar.SUNDAY = 1, not 0
-//        departTime.set(Calendar.HOUR_OF_DAY, arrivalHour);
-//        departTime.set(Calendar.MINUTE, arrivalMinutes);
-//        departTime.set(Calendar.SECOND, 0);
+        if (type >= 0 && type < 7 ) { // WAKE UP ALARM
 
+            alarmTime.set(Calendar.DAY_OF_WEEK, day+1); // +1 here because Calendar.SUNDAY = 1, not 0
+            alarmTime.set(Calendar.HOUR_OF_DAY, arrivalHour);
+            alarmTime.set(Calendar.MINUTE, arrivalMinutes);
+            alarmTime.set(Calendar.SECOND, 0);
 
+            System.out.println(alarmTime.getTime().toString());
+
+            alarmTime.add(Calendar.MINUTE, -travelTime);
+
+            System.out.println(alarmTime.getTime().toString());
+
+        } else if ( type >= 7 && type < 14){ // DEPART ALARM
+
+            alarmTime.set(Calendar.DAY_OF_WEEK, day+1); // +1 here because Calendar.SUNDAY = 1, not 0
+            alarmTime.set(Calendar.HOUR_OF_DAY, arrivalHour);
+            alarmTime.set(Calendar.MINUTE, arrivalMinutes);
+            alarmTime.set(Calendar.SECOND, 0);
+
+            alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes));
+
+        }
 
     }
 
@@ -91,7 +107,7 @@ public class Alarm implements Serializable {
 
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP, wakeUpTime.getTimeInMillis(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
     }
 
     public String getTimeUntilNextAlarmMessage(){
@@ -126,27 +142,9 @@ public class Alarm implements Serializable {
      */
     public void updateAlarm() {
 
-
         if (this.getAlarmTime().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
             // In here means this alarm is in the past but needs to be repeated so we can just add 1 week to the alarm
-            this.wakeUpTime.add(Calendar.WEEK_OF_YEAR, 1);
+            this.alarmTime.add(Calendar.WEEK_OF_YEAR, 1);
         }
-
-
-//        if (commute.alarmArmed) { // We need to change to OFF
-//            commute.alarmArmed = false;
-//            alarmManager.cancel(pendingIntent);
-//            setAlarmText("");
-//            Log.d("MyActivity", "Alarm Off");
-//        } else { // We need to change to ON
-//            commute.alarmArmed = true;
-//            Log.d("MyActivity", "Alarm On");
-//            Calendar calendar = Calendar.getInstance();
-//            calendar.set(Calendar.HOUR_OF_DAY, alarmTimePicker.getCurrentHour());
-//            calendar.set(Calendar.MINUTE, alarmTimePicker.getCurrentMinute());
-//            Intent myIntent = new Intent(AlarmActivity.this, AlarmReceiver.class);
-//            pendingIntent = PendingIntent.getBroadcast(AlarmActivity.this, 0, myIntent, 0);
-//            alarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
-//        }
     }
 }
