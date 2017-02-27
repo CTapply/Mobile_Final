@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
@@ -31,6 +32,7 @@ public class AlarmAlertActivity extends Activity {
     private Vibrator vibrator;
 
     private boolean alarmActive;
+    private Button dismissButton = (Button) findViewById(R.id.dismissButton);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +50,20 @@ public class AlarmAlertActivity extends Activity {
 
 //        this.setTitle(alarm.getAlarmName());
 
+        dismissButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Google Maps Launch Turn-By-Turn Navigation:
+                // https://developers.google.com/maps/documentation/android-api/intents
+                // TODO: Pass commute destination address instead of exampleLocation
+                String exampleLocation = "Sole Proprietor, Worcester MA";
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(exampleLocation));
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
+            }
+        });
         startAlarm();
-
     }
 
     @Override

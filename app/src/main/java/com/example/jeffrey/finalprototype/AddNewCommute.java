@@ -66,10 +66,28 @@ public class AddNewCommute extends FragmentActivity{
         final Intent addCommute = new Intent(this, CommuteListActivity.class);
 
         final Intent passedIntent = getIntent();
+        final int uuid = passedIntent.getIntExtra("UUID", -1);
         editMode = passedIntent.getBooleanExtra("EDIT_MODE", false);
         if(editMode){
             addButton.setText(R.string.edit_commute);
+            if(uuid == -1){
+                System.out.println("UUID NONEXISTENT, CHECK DATA PERSISTENCE");
+            }
+            editTextID.setText(passedIntent.getStringExtra("id"));
+            setArrivalTime(passedIntent.getIntExtra("arr_hour", 12), passedIntent.getIntExtra("arr_min", 0));
+            int prepMins = passedIntent.getIntExtra("prep_mins", 0);
+            selectedPrepTime.setText(semanticPrep(prepMins/60, prepMins%60));
+            selectedDestination.setText(passedIntent.getStringExtra("destination"));
+            sunday.setChecked(passedIntent.getBooleanExtra("sunday", false));
+            monday.setChecked(passedIntent.getBooleanExtra("monday", false));
+            tuesday.setChecked(passedIntent.getBooleanExtra("tuesday", false));
+            wednesday.setChecked(passedIntent.getBooleanExtra("wednesday", false));
+            thursday.setChecked(passedIntent.getBooleanExtra("thursday", false));
+            friday.setChecked(passedIntent.getBooleanExtra("friday", false));
+            saturday.setChecked(passedIntent.getBooleanExtra("saturday", false));
+            repeat.setChecked(passedIntent.getBooleanExtra("repeat", false));
         }
+
 
         arrTimeButton.setOnClickListener(new View.OnClickListener() {
              @Override
@@ -81,23 +99,27 @@ public class AddNewCommute extends FragmentActivity{
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(editMode){
 
+                System.out.println("editTextID.getText().toString() " + editTextID.getText().toString());
+                addCommute.putExtra("id", editTextID.getText().toString());
+                addCommute.putExtra("arr_hour", getHourFromTime(selectedArrTime.getText().toString()));
+                addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
+                addCommute.putExtra("prep_mins", getPrepMins(selectedPrepTime.getText().toString()));
+                addCommute.putExtra("destination", selectedDestination.getText().toString());
+                addCommute.putExtra("sunday", sunday.isChecked());
+                addCommute.putExtra("monday", monday.isChecked());
+                addCommute.putExtra("tuesday", tuesday.isChecked());
+                addCommute.putExtra("wednesday", wednesday.isChecked());
+                addCommute.putExtra("thursday", thursday.isChecked());
+                addCommute.putExtra("friday", friday.isChecked());
+                addCommute.putExtra("saturday", saturday.isChecked());
+                addCommute.putExtra("repeat", repeat.isChecked());
+
+                if(editMode){
+                    addCommute.putExtra("EDIT_MODE", editMode);
+                    addCommute.putExtra("UUID", uuid);
+                    startActivity(addCommute);
                 } else {
-                    System.out.println("editTextID.getText().toString() " + editTextID.getText().toString());
-                    addCommute.putExtra("id", editTextID.getText().toString());
-                    addCommute.putExtra("arr_hour", getHourFromTime(selectedArrTime.getText().toString()));
-                    addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
-                    addCommute.putExtra("prep_mins", getPrepMins(selectedPrepTime.getText().toString()));
-                    addCommute.putExtra("destination", selectedDestination.getText().toString());
-                    addCommute.putExtra("sunday", sunday.isChecked());
-                    addCommute.putExtra("monday", monday.isChecked());
-                    addCommute.putExtra("tuesday", tuesday.isChecked());
-                    addCommute.putExtra("wednesday", wednesday.isChecked());
-                    addCommute.putExtra("thursday", thursday.isChecked());
-                    addCommute.putExtra("friday", friday.isChecked());
-                    addCommute.putExtra("saturday", saturday.isChecked());
-                    addCommute.putExtra("repeat", repeat.isChecked());
                     setResult(Activity.RESULT_OK, addCommute);
                     finish();
                 }
@@ -185,29 +207,29 @@ public class AddNewCommute extends FragmentActivity{
         }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putString("id", editTextID.getText().toString());
-        savedInstanceState.putString("arr_time", selectedArrTime.getText().toString());
-        savedInstanceState.putString("prep_time", selectedPrepTime.getText().toString());
-        savedInstanceState.putString("destination", selectedDestination.getText().toString());
-
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        String commuteID = savedInstanceState.getString("id");
-        String arrTime = savedInstanceState.getString("arr_time");
-        String prepTime = savedInstanceState.getString("prep_time");
-        String dest = savedInstanceState.getString("destination");
-
-        editTextID.setText(commuteID);
-        selectedArrTime.setText(arrTime);
-        selectedPrepTime.setText(prepTime);
-        selectedDestination.setText(dest);
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle savedInstanceState) {
+//        super.onSaveInstanceState(savedInstanceState);
+//        savedInstanceState.putString("id", editTextID.getText().toString());
+//        savedInstanceState.putString("arr_time", selectedArrTime.getText().toString());
+//        savedInstanceState.putString("prep_time", selectedPrepTime.getText().toString());
+//        savedInstanceState.putString("destination", selectedDestination.getText().toString());
+//
+//    }
+//
+//    @Override
+//    public void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        String commuteID = savedInstanceState.getString("id");
+//        String arrTime = savedInstanceState.getString("arr_time");
+//        String prepTime = savedInstanceState.getString("prep_time");
+//        String dest = savedInstanceState.getString("destination");
+//
+//        editTextID.setText(commuteID);
+//        selectedArrTime.setText(arrTime);
+//        selectedPrepTime.setText(prepTime);
+//        selectedDestination.setText(dest);
+//    }
 
     public void setArrivalTime(int hour, int min) {
         String time = semanticTime(hour, min);

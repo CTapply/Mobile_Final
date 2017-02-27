@@ -71,11 +71,37 @@ public class CommuteListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivityForResult(addCommuteIntent, NEW_COMMUTE_REQUEST);
+
             }
         });
 
         Context mContext = getApplicationContext();
         mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
+        Intent passedIntent = getIntent();
+        if(passedIntent.getBooleanExtra("EDIT_MODE", false)){
+            boolean[] days = new boolean[7];
+            days[0] = passedIntent.getBooleanExtra("sunday", false);
+            days[1] = passedIntent.getBooleanExtra("monday", false);
+            days[2] = passedIntent.getBooleanExtra("tuesday", false);
+            days[3] = passedIntent.getBooleanExtra("wednesday", false);
+            days[4] = passedIntent.getBooleanExtra("thursday", false);
+            days[5] = passedIntent.getBooleanExtra("friday", false);
+            days[6] = passedIntent.getBooleanExtra("saturday", false);
+            boolean repeat = passedIntent.getBooleanExtra("repeat", false);
+            WeeklyInfo week = new WeeklyInfo(days, repeat);
+            Commute toUpdate = new Commute(
+                    passedIntent.getStringExtra("id"),
+                    passedIntent.getStringExtra("destination"),
+                    passedIntent.getIntExtra("arr_hour", 12),
+                    passedIntent.getIntExtra("arr_min", 0),
+                    passedIntent.getIntExtra("prep_mins", 0),
+                    week,
+                    passedIntent.getIntExtra("UUID", -1),
+                    passedIntent.getBooleanExtra("repeat", false),
+                    mContext
+            );
+            toUpdate.updateCommute();
+        }
 
         Content.populate(this);
         View recyclerView = findViewById(R.id.commute_list);
@@ -160,12 +186,6 @@ public class CommuteListActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
 
-
-
-//        for (Commute commute : Content.ITEMS){
-//            ContentValues values = getContentValues(commute);
-//            mDatabase.insert(CommuteTable.NAME, null, values);
-//        }
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {

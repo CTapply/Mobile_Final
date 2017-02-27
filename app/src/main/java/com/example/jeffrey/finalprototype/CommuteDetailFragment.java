@@ -1,14 +1,22 @@
 package com.example.jeffrey.finalprototype;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import database.CommuteDbSchema;
+
+import static com.example.jeffrey.finalprototype.CommuteListActivity.mDatabase;
+import static database.CommuteDbSchema.*;
 
 /**
  * A fragment representing a single Commute detail screen.
@@ -45,7 +53,7 @@ public class CommuteDetailFragment extends Fragment {
             // to load content from a content provider.
             mItem = Content.COMMUTE_MAP.get(getArguments().getString(ARG_ITEM_ID));
 
-            Activity activity = this.getActivity();
+//            Activity activity = this.getActivity();
 //            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
 //            if (appBarLayout != null && mItem != null) {
 //                appBarLayout.setTitle(mItem.id);
@@ -67,6 +75,47 @@ public class CommuteDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.textView10)).setText(mItem.weekInfo.toString());
             CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
             alarmArmed.setChecked(mItem.active);
+
+            Button deleteButton  = (Button) rootView.findViewById(R.id.deleteButton);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String uuidString = Integer.toString(mItem.UUID);
+                    if(mDatabase.delete(CommuteTable.NAME, "_id=" + uuidString, null) > 0){
+                        Toast.makeText(getActivity(), "Commute Successfully Deleted",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), "Could Not Delete Commute",
+                                Toast.LENGTH_LONG).show();
+                    }
+                    Intent deleteCommuteIntent = new Intent(getActivity(), CommuteListActivity.class);
+                    startActivity(deleteCommuteIntent);
+                }
+            });
+
+            Button editButton  = (Button) rootView.findViewById(R.id.editButton);
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent editCommuteIntent = new Intent(getActivity(), AddNewCommute.class);
+                    editCommuteIntent.putExtra("EDIT_MODE", true);
+                    editCommuteIntent.putExtra("UUID", mItem.UUID);
+                    editCommuteIntent.putExtra("id", mItem.id);
+                    editCommuteIntent.putExtra("arr_hour", mItem.arrivalTimeHour);
+                    editCommuteIntent.putExtra("arr_min", mItem.arrivalTimeMin);
+                    editCommuteIntent.putExtra("prep_mins", mItem.preparationTime);
+                    editCommuteIntent.putExtra("destination", mItem.destination);
+                    editCommuteIntent.putExtra("sunday", mItem.weekInfo.days[0]);
+                    editCommuteIntent.putExtra("monday", mItem.weekInfo.days[1]);
+                    editCommuteIntent.putExtra("tuesday", mItem.weekInfo.days[2]);
+                    editCommuteIntent.putExtra("wednesday", mItem.weekInfo.days[3]);
+                    editCommuteIntent.putExtra("thursday", mItem.weekInfo.days[4]);
+                    editCommuteIntent.putExtra("friday", mItem.weekInfo.days[5]);
+                    editCommuteIntent.putExtra("saturday", mItem.weekInfo.days[6]);
+                    editCommuteIntent.putExtra("repeat", mItem.weekInfo.repeat);
+                    startActivity(editCommuteIntent);
+                }
+            });
         }
 
         return rootView;
