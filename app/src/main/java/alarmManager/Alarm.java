@@ -34,7 +34,7 @@ public class Alarm implements Serializable {
     public boolean repeat;
 
     public boolean armed;
-    private transient Commute commute;
+    public transient Commute commute;
 
     public Alarm(int arrivalHour, int arrivalMinutes, int prepTimeInMinutes, int type, boolean armed) {
         this.arrivalHour = arrivalHour;

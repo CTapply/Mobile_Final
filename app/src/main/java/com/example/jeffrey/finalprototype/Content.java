@@ -327,12 +327,12 @@ public class Content implements Serializable {
          */
         public void disarmAlarms() {
             this.active = false;
-            updateCommute();
             for (Alarm a : alarms) {
                 if (a != null) {
                     a.armed = false;
                 }
             }
+            updateCommute();
         }
 
         /**
@@ -340,13 +340,13 @@ public class Content implements Serializable {
          */
         public void activateAlarms() {
             this.active = true;
-            updateCommute();
             for (Alarm a : alarms) {
                 if (a != null) {
                     a.armed = true;
                     a.updateAlarm();
                 }
             }
+            updateCommute();
         }
 
         /**
