@@ -163,10 +163,8 @@ public class Content implements Serializable {
         }
 
         public String toString(){
-            if(!this.repeat)
-                return "None";
             boolean notFirst = false;
-            String result = "Every ";
+            String result = "";
             if(days[0]) {
                 result += "Sunday";
                 notFirst = true;

@@ -61,7 +61,7 @@ public class AddNewCommute extends FragmentActivity{
         final ToggleButton thursday = (ToggleButton) findViewById(R.id.thursdayButton);
         final ToggleButton friday = (ToggleButton) findViewById(R.id.fridayButton);
         final ToggleButton saturday = (ToggleButton) findViewById(R.id.saturdayButton);
-        final CheckBox repeat = (CheckBox) findViewById(R.id.repeatCheckBox);
+//        final CheckBox repeat = (CheckBox) findViewById(R.id.repeatCheckBox);
 
         final Intent addCommute = new Intent(this, CommuteListActivity.class);
 
@@ -85,7 +85,7 @@ public class AddNewCommute extends FragmentActivity{
             thursday.setChecked(passedIntent.getBooleanExtra("thursday", false));
             friday.setChecked(passedIntent.getBooleanExtra("friday", false));
             saturday.setChecked(passedIntent.getBooleanExtra("saturday", false));
-            repeat.setChecked(passedIntent.getBooleanExtra("repeat", false));
+//            repeat.setChecked(passedIntent.getBooleanExtra("repeat", false));
         }
 
 
@@ -113,7 +113,7 @@ public class AddNewCommute extends FragmentActivity{
                 addCommute.putExtra("thursday", thursday.isChecked());
                 addCommute.putExtra("friday", friday.isChecked());
                 addCommute.putExtra("saturday", saturday.isChecked());
-                addCommute.putExtra("repeat", repeat.isChecked());
+                addCommute.putExtra("repeat", true);
 
                 if(editMode){
                     addCommute.putExtra("EDIT_MODE", editMode);

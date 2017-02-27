@@ -97,7 +97,7 @@ public class CommuteListActivity extends AppCompatActivity {
                     passedIntent.getIntExtra("prep_mins", 0),
                     week,
                     passedIntent.getIntExtra("UUID", -1),
-                    passedIntent.getBooleanExtra("repeat", false),
+                    passedIntent.getBooleanExtra("true", true),
                     mContext
             );
             toUpdate.updateCommute();
@@ -231,11 +231,11 @@ public class CommuteListActivity extends AppCompatActivity {
                 holder.mAlarmSwitch.setChecked(true);
 
                 // Set the color of the Selected days of the alarm
-                if (holder.mCommute.weekInfo.repeat == true) {
-                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081")); // Pink
-                } else {
-                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
-                }
+//                if (holder.mCommute.weekInfo.repeat == true) {
+//                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081")); // Pink
+//                } else {
+//                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
+//                }
                 for (int i = 0; i < holder.mCommute.weekInfo.days.length; i++) {
                     if (holder.mCommute.weekInfo.days[i]) {
                         holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));// Pink
@@ -254,7 +254,7 @@ public class CommuteListActivity extends AppCompatActivity {
 //                }
             } else { // not active
                 holder.mAlarmSwitch.setChecked(false);
-                holder.mAlarmRepeat.setColorFilter(Color.parseColor("#BDBDBD"));// Light gray
+//                holder.mAlarmRepeat.setColorFilter(Color.parseColor("#BDBDBD"));// Light gray
                 for (int i = 0; i < holder.mCommute.weekInfo.days.length; i++) {
                     holder.mDayList.get(i).setTextColor(Color.parseColor("#BDBDBD"));// Light gray
                 }
@@ -281,11 +281,11 @@ public class CommuteListActivity extends AppCompatActivity {
                     callAlarmScheduleService();
 
                     // Setting the colors
-                    if (holder.mCommute.weekInfo.repeat == true) {
-                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));// Pink
-                    } else {
-                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
-                    }
+//                    if (holder.mCommute.weekInfo.repeat == true) {
+//                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));// Pink
+//                    } else {
+//                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
+//                    }
                     for (int i = 0; i < holder.mCommute.weekInfo.days.length; i ++) {
                         if (holder.mAlarmSwitch.isChecked()) {
                             if (holder.mCommute.weekInfo.days[i]) {
@@ -294,7 +294,7 @@ public class CommuteListActivity extends AppCompatActivity {
                                 holder.mDayList.get(i).setTextColor(Color.parseColor("#757575")); // Dark gray
                             }
                         } else {
-                            holder.mAlarmRepeat.setColorFilter(Color.parseColor("#BDBDBD")); // Light gray
+//                            holder.mAlarmRepeat.setColorFilter(Color.parseColor("#BDBDBD")); // Light gray
                             holder.mDayList.get(i).setTextColor(Color.parseColor("#BDBDBD")); // Light gray
                         }
                     }
@@ -345,7 +345,7 @@ public class CommuteListActivity extends AppCompatActivity {
             final View mView;
             final TextView mContentView;
             final Switch mAlarmSwitch;
-            final ImageView mAlarmRepeat;
+//            final ImageView mAlarmRepeat;
             final TextView mSunday, mMonday, mTuesday, mWednesday, mThursday, mFriday, mSaturday;
             final LinkedList<TextView> mDayList = new LinkedList<>();
             Commute mCommute;
@@ -356,7 +356,7 @@ public class CommuteListActivity extends AppCompatActivity {
 //                mIdView = (TextView) view.findViewById(R.id.id);
                 mContentView = (TextView) view.findViewById(R.id.content);
                 mAlarmSwitch = (Switch) view.findViewById(R.id.alarmSwitch);
-                mAlarmRepeat = (ImageView) view.findViewById(R.id.alarmRepeat);
+//                mAlarmRepeat = (ImageView) view.findViewById(R.id.alarmRepeat);
                 mSunday = (TextView) view.findViewById(R.id.textViewSun);
                 mMonday = (TextView) view.findViewById(R.id.textViewMon);
                 mTuesday = (TextView) view.findViewById(R.id.textViewTues);

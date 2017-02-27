@@ -73,8 +73,8 @@ public class CommuteDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.textView6)).setText(mItem.semanticPrepTime());
             ((TextView) rootView.findViewById(R.id.textView8)).setText(mItem.destination);
             ((TextView) rootView.findViewById(R.id.textView10)).setText(mItem.weekInfo.toString());
-            CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
-            alarmArmed.setChecked(mItem.active);
+//            CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
+//            alarmArmed.setChecked(mItem.active);
 
             Button deleteButton  = (Button) rootView.findViewById(R.id.deleteButton);
             deleteButton.setOnClickListener(new View.OnClickListener() {
