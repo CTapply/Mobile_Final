@@ -28,6 +28,8 @@ public class CommuteBaseHelper extends SQLiteOpenHelper {
                 CommuteTable.Cols.ARR_MIN + ", "  +
                 CommuteTable.Cols.PREP_MINS + ", " +
                 CommuteTable.Cols.DESTINATION + ", " +
+                CommuteTable.Cols.LATITUDE + ", " +
+                CommuteTable.Cols.LONGITUDE + ", " +
                 CommuteTable.Cols.REPEAT + ", " +
                 CommuteTable.Cols.SUNDAY + ", " +
                 CommuteTable.Cols.MONDAY + ", " +
@@ -38,7 +40,6 @@ public class CommuteBaseHelper extends SQLiteOpenHelper {
                 CommuteTable.Cols.SATURDAY + ", " +
                 CommuteTable.Cols.ACTIVE +
                 ")");
-
     }
 
     @Override

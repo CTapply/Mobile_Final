@@ -79,6 +79,8 @@ public class Content implements Serializable {
         values.put(Cols.ARR_MIN, commute.arrivalTimeMin);
         values.put(Cols.PREP_MINS, commute.preparationTime);
         values.put(Cols.DESTINATION, commute.destination);
+        values.put(Cols.LATITUDE, commute.destination);
+        values.put(Cols.LONGITUDE, commute.destination);
         values.put(Cols.REPEAT, boolToInt(commute.weekInfo.repeat));
         values.put(Cols.SUNDAY, boolToInt(commute.weekInfo.days[0]));
         values.put(Cols.MONDAY, boolToInt(commute.weekInfo.days[1]));
@@ -219,6 +221,7 @@ public class Content implements Serializable {
         public final String id;
         public final int UUID;
         public String destination;
+        double latitude, longitude;
         public int arrivalTimeHour;
         public int arrivalTimeMin;
         public String timeMode;
@@ -230,10 +233,12 @@ public class Content implements Serializable {
         public Context context;
         public boolean active;
 
-        public Commute(String id, String destination, int arrivalTimeHour,
+        public Commute(String id, String destination, double latitude, double longitude, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, Context c) {
             this.id = id;
             this.destination = destination;
+            this.latitude = latitude;
+            this.longitude = longitude;
             this.arrivalTimeHour = arrivalTimeHour;
             this.arrivalTimeMin = arrivalTimeMin;
             this.preparationTime = preparationTime;
@@ -271,11 +276,13 @@ public class Content implements Serializable {
 
         }
 
-        public Commute(String id, String destination, int arrivalTimeHour,
+        public Commute(String id, String destination, double latitude, double longitude, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
                        int uuid, boolean active, Context c) {
             this.id = id;
             this.destination = destination;
+            this.latitude = latitude;
+            this.longitude = longitude;
             this.arrivalTimeHour = arrivalTimeHour;
             this.arrivalTimeMin = arrivalTimeMin;
             this.preparationTime = preparationTime;

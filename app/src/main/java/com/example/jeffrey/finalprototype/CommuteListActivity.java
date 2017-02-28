@@ -92,6 +92,8 @@ public class CommuteListActivity extends AppCompatActivity {
             Commute toUpdate = new Commute(
                     passedIntent.getStringExtra("id"),
                     passedIntent.getStringExtra("destination"),
+                    passedIntent.getDoubleExtra("latitude", 0.0f),
+                    passedIntent.getDoubleExtra("longitude", 0.0f),
                     passedIntent.getIntExtra("arr_hour", 12),
                     passedIntent.getIntExtra("arr_min", 0),
                     passedIntent.getIntExtra("prep_mins", 0),
@@ -137,6 +139,8 @@ public class CommuteListActivity extends AppCompatActivity {
                 int arrMin = data.getIntExtra("arr_min", 0);
                 int prepMins = data.getIntExtra("prep_mins", 0);
                 String destination = data.getStringExtra("destination");
+                double latitude = data.getDoubleExtra("latitude", 0.0f);
+                double longitude = data.getDoubleExtra("longitude", 0.0f);
 
                 boolean sunday = data.getBooleanExtra("sunday", false);
                 boolean monday = data.getBooleanExtra("monday", false);
@@ -149,7 +153,7 @@ public class CommuteListActivity extends AppCompatActivity {
 
                 WeeklyInfo w = makeWeek(sunday, monday, tuesday, wednesday, thursday, friday, saturday, repeat);
 
-                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w, true, this);
+                Commute newCommute = new Commute(name, destination, latitude, longitude, arrHour, arrMin, prepMins, w, true, this);
                 Context mContext = getApplicationContext();
                 SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
                 addItem(newCommute, mDatabase);
