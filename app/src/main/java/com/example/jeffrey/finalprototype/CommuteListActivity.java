@@ -25,7 +25,9 @@ import android.widget.Toast;
 
 import com.example.jeffrey.finalprototype.Content.Commute;
 import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
+import com.google.android.gms.location.Geofence;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +37,7 @@ import alarmManager.AlarmServiceReceiver;
 import database.CommuteBaseHelper;
 import database.CommuteDbSchema;
 import database.CommuteDbSchema.CommuteTable;
+import geofence.GeofenceAssets;
 
 import static com.example.jeffrey.finalprototype.Content.addItem;
 
@@ -55,6 +58,7 @@ public class CommuteListActivity extends AppCompatActivity {
     private boolean mTwoPane;
     private static final int NEW_COMMUTE_REQUEST = 50;
     public static SQLiteDatabase mDatabase;
+    private List<Geofence> geofences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,9 @@ public class CommuteListActivity extends AppCompatActivity {
 
             }
         });
+
+        // Create list of geofences
+        geofences = new ArrayList<>();
 
         Context mContext = getApplicationContext();
         mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
@@ -104,6 +111,7 @@ public class CommuteListActivity extends AppCompatActivity {
             );
             toUpdate.updateCommute();
         }
+
 
         Content.populate(this);
         View recyclerView = findViewById(R.id.commute_list);
@@ -158,6 +166,9 @@ public class CommuteListActivity extends AppCompatActivity {
                 SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
                 addItem(newCommute, mDatabase);
 
+                // add new commute to the geofence
+                geofences.add(GeofenceAssets.buildGeofence(newCommute.id, newCommute.latitude, newCommute.longitude));
+
                 Content.populate(this);
                 View recyclerView = findViewById(R.id.commute_list);
                 assert recyclerView != null;
@@ -203,6 +214,16 @@ public class CommuteListActivity extends AppCompatActivity {
 
         public SimpleItemRecyclerViewAdapter(List<Commute> items) {
             mValues = items;
+
+            // Add to the geofence list if we need to
+            for(Commute c : mValues){
+                if(!GeofenceAssets.geofenceExists(c.id, geofences))
+                    geofences.add(GeofenceAssets.buildGeofence(c.id, c.latitude, c.longitude));
+            }
+
+            // print out what's in the list
+            for(Geofence g : geofences)
+                System.out.println("GEOFENCE: ID - " + g.getRequestId());
         }
 
         @Override

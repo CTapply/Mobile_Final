@@ -31,6 +31,8 @@ public class CommuteDetailFragment extends Fragment {
      */
     public static final String ARG_ITEM_ID = "item_id";
 
+    //public static final int RESULT_DELETE_COMMUTE = 77;
+
     /**
      * The dummy content this fragment is presenting.
      */
