@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,6 +26,12 @@ import android.widget.Toast;
 
 import com.example.jeffrey.finalprototype.Content.Commute;
 import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
+import com.example.jeffrey.finalprototype.machinelearning.BaseNetwork;
+import com.example.jeffrey.finalprototype.weather.JSONWeatherParser;
+import com.example.jeffrey.finalprototype.weather.WeatherHttpClient;
+import com.example.jeffrey.finalprototype.weather.model.Weather;
+
+import org.json.JSONException;
 import com.google.android.gms.location.Geofence;
 
 import java.util.ArrayList;
@@ -51,6 +58,8 @@ import static com.example.jeffrey.finalprototype.Content.addItem;
  * item details side-by-side using two vertical panes.
  */
 public class CommuteListActivity extends AppCompatActivity {
+
+    String defaultCity = "Worcester,us";
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -126,6 +135,13 @@ public class CommuteListActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+
+        /** Uncomment these two lines to test the weather task */
+        JSONWeatherTask task = new JSONWeatherTask();
+        task.execute(new String[]{defaultCity});
+
+        /** Uncomment this line to test a basic neural network */
+        // BaseNetwork net = new BaseNetwork();
 
         callAlarmScheduleService();
 
@@ -404,6 +420,30 @@ public class CommuteListActivity extends AppCompatActivity {
             public String toString() {
                 return super.toString() + " '" + mContentView.getText() + "'";
             }
+        }
+    }
+
+    /**
+     * Private class for monitoring weather information in the background
+     * TODO: Push this into the machine learning code
+     */
+    private class JSONWeatherTask extends AsyncTask<String, Void, Weather> {
+        @Override
+        protected Weather doInBackground(String... params) {
+            Weather weather = new Weather();
+            String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
+
+            try {
+                weather = JSONWeatherParser.getWeather(data);
+
+                System.out.println("WEATHER COND: " + weather.currentCondition.getDescr());
+                System.out.println("WEATHER TEMP: " + weather.temperature.getTemp() + "F");
+                System.out.println("SNOWFALL: " + weather.snow.getAmount());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return weather;
         }
     }
 }
