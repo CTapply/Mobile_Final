@@ -38,6 +38,7 @@ import database.CommuteBaseHelper;
 import database.CommuteDbSchema;
 import database.CommuteDbSchema.CommuteTable;
 import geofence.GeofenceAssets;
+import geofence.GeofenceTransitionIntentService;
 
 import static com.example.jeffrey.finalprototype.Content.addItem;
 
@@ -128,7 +129,12 @@ public class CommuteListActivity extends AppCompatActivity {
 
         callAlarmScheduleService();
 
-
+        // start geofence service if not already running
+        if(!GeofenceTransitionIntentService.RUNNING) {
+            startService(new Intent(getBaseContext(), GeofenceTransitionIntentService.class));
+            GeofenceTransitionIntentService.RUNNING = true;
+            System.out.println("GEOFENCE: Starting service");
+        }
     }
 
     protected void callAlarmScheduleService() {
@@ -220,10 +226,6 @@ public class CommuteListActivity extends AppCompatActivity {
                 if(!GeofenceAssets.geofenceExists(c.id, geofences))
                     geofences.add(GeofenceAssets.buildGeofence(c.id, c.latitude, c.longitude));
             }
-
-            // print out what's in the list
-            for(Geofence g : geofences)
-                System.out.println("GEOFENCE: ID - " + g.getRequestId());
         }
 
         @Override

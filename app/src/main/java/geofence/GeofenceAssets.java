@@ -58,12 +58,9 @@ public class GeofenceAssets {
     public static boolean geofenceExists(String id, List<Geofence> geofences){
         for(Geofence g : geofences){
             if(g.getRequestId().equals(id)) {
-                System.out.println("GEOFENCE: Geofence already created with id: " + id);
                 return true;
             }
         }
-
-        System.out.println("GEOFENCE: New geofence found with id: " + id);
         return false;
     }
 }

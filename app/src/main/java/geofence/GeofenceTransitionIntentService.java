@@ -3,6 +3,7 @@ package geofence;
 import android.app.IntentService;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.example.jeffrey.finalprototype.CommuteListActivity;
 import com.google.android.gms.location.Geofence;
@@ -18,11 +19,20 @@ import java.util.List;
 
 public class GeofenceTransitionIntentService extends IntentService {
 
+    public static boolean RUNNING = false;
+
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      */
     public GeofenceTransitionIntentService() {
         super("geofence");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // Let it continue running until it is stopped.
+        Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
+        return START_STICKY;
     }
 
     @Override
