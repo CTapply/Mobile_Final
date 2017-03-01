@@ -68,7 +68,6 @@ public class CommuteListActivity extends AppCompatActivity {
     private boolean mTwoPane;
     private static final int NEW_COMMUTE_REQUEST = 50;
     public static SQLiteDatabase mDatabase;
-    private List<Geofence> geofences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,10 +87,6 @@ public class CommuteListActivity extends AppCompatActivity {
 
             }
         });
-
-        // Create list of geofences
-        geofences = new ArrayList<>();
-
         Context mContext = getApplicationContext();
         mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
         Intent passedIntent = getIntent();
@@ -137,11 +132,11 @@ public class CommuteListActivity extends AppCompatActivity {
         }
 
         /** Uncomment these two lines to test the weather task */
-        JSONWeatherTask task = new JSONWeatherTask();
-        task.execute(new String[]{defaultCity});
+        //JSONWeatherTask task = new JSONWeatherTask();
+        //task.execute(new String[]{defaultCity});
 
         /** Uncomment this line to test a basic neural network */
-        // BaseNetwork net = new BaseNetwork();
+        //BaseNetwork net = new BaseNetwork();
 
         callAlarmScheduleService();
 
@@ -149,7 +144,6 @@ public class CommuteListActivity extends AppCompatActivity {
         if(!GeofenceTransitionIntentService.RUNNING) {
             startService(new Intent(getBaseContext(), GeofenceTransitionIntentService.class));
             GeofenceTransitionIntentService.RUNNING = true;
-            System.out.println("GEOFENCE: Starting service");
         }
     }
 
@@ -188,8 +182,8 @@ public class CommuteListActivity extends AppCompatActivity {
                 SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
                 addItem(newCommute, mDatabase);
 
-                // add new commute to the geofence
-                geofences.add(GeofenceAssets.buildGeofence(newCommute.id, newCommute.latitude, newCommute.longitude));
+                // add new commute to the geofence, make the ID more unique by appending the latitude and longitude
+                GeofenceAssets.addGeofence(newCommute.id + newCommute.latitude + newCommute.longitude, newCommute.latitude, newCommute.longitude);
 
                 Content.populate(this);
                 View recyclerView = findViewById(R.id.commute_list);
@@ -237,10 +231,10 @@ public class CommuteListActivity extends AppCompatActivity {
         public SimpleItemRecyclerViewAdapter(List<Commute> items) {
             mValues = items;
 
-            // Add to the geofence list if we need to
+            // Add to the geofence list if we need to, make the ID more unique by appending the latitude and longitude
             for(Commute c : mValues){
-                if(!GeofenceAssets.geofenceExists(c.id, geofences))
-                    geofences.add(GeofenceAssets.buildGeofence(c.id, c.latitude, c.longitude));
+                if(!GeofenceAssets.geofenceExists(c.id + c.latitude + c.longitude))
+                    GeofenceAssets.addGeofence(c.id+ c.latitude + c.longitude, c.latitude, c.longitude);
             }
         }
 

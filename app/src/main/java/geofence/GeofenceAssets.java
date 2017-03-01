@@ -2,11 +2,13 @@ package geofence;
 
 import com.google.android.gms.location.Geofence;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
 /**
+ * Helper functions for interacting with Geofences
  * Created by tjvalcourt on 2/27/2017.
  */
 
@@ -21,8 +23,8 @@ public class GeofenceAssets {
      * @param longitude Longitude of the location
      * @return Geofence object with these paremeters
      */
-    public static Geofence buildGeofence(String id, double latitude, double longitude) {
-        return new Geofence.Builder()
+    public static void addGeofence(String id, double latitude, double longitude) {
+        GeofenceTransitionIntentService.geofences.add(new Geofence.Builder()
                 // Set the request ID of the geofence. This is a string to identify this
                 // geofence.
                 .setRequestId(id)
@@ -46,17 +48,16 @@ public class GeofenceAssets {
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL)
 
                 // Create the geofence.
-                .build();
+                .build());
     }
 
     /**
      * Checks if the geofence exists in the list or not already
      * @param id ID of the geofence based on the commute
-     * @param geofences List of geofences
      * @return TRUE if it's in the list already, FALSE otherwise
      */
-    public static boolean geofenceExists(String id, List<Geofence> geofences){
-        for(Geofence g : geofences){
+    public static boolean geofenceExists(String id){
+        for(Geofence g : GeofenceTransitionIntentService.geofences){
             if(g.getRequestId().equals(id)) {
                 return true;
             }

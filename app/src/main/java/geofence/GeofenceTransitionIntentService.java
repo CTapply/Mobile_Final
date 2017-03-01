@@ -20,19 +20,13 @@ import java.util.List;
 public class GeofenceTransitionIntentService extends IntentService {
 
     public static boolean RUNNING = false;
+    public static List<Geofence> geofences = new ArrayList<>();
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      */
     public GeofenceTransitionIntentService() {
         super("geofence");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // Let it continue running until it is stopped.
-        Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
-        return START_STICKY;
     }
 
     @Override
