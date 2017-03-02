@@ -81,6 +81,32 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:text="@string/ringTone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ringToneTitle"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+            android:padding="5dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/ringToneText"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <Button
+        android:text="@string/ringToneButtonText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ringToneButton"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
             android:text="@string/destination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -36,12 +36,14 @@ public class CommuteCursorWrapper extends CursorWrapper {
         boolean friday = getInt(getColumnIndex(CommuteTable.Cols.FRIDAY)) > 0;
         boolean saturday = getInt(getColumnIndex(CommuteTable.Cols.SATURDAY)) > 0;
         boolean active = getInt(getColumnIndex(CommuteTable.Cols.ACTIVE)) > 0;
+        String tone = getString(getColumnIndex(CommuteTable.Cols.TONE));
+        String tonepath = getString(getColumnIndex(CommuteTable.Cols.TONEPATH));
 
         Content.WeeklyInfo w = CommuteListActivity.makeWeek(
                 sunday, monday, tuesday, wednesday, thursday,
                 friday, saturday, repeat
         );
-        Commute c = new Commute(id, destination, arr_hour, arr_min, prep_mins, w, uuid, active, context);
+        Commute c = new Commute(id, destination, arr_hour, arr_min, prep_mins, w, uuid, active,tone, tonepath, context);
 
         return c;
     }

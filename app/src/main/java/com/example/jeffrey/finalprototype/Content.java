@@ -41,6 +41,9 @@ public class Content implements Serializable {
      */
     public static Map<String, Commute> COMMUTE_MAP = new HashMap<String, Commute>();
 
+    public static AlarmTone Tones;
+
+
     private static final int COUNT = 25;
 
     static {
@@ -87,6 +90,8 @@ public class Content implements Serializable {
         values.put(Cols.THURSDAY, boolToInt(commute.weekInfo.days[4]));
         values.put(Cols.FRIDAY, boolToInt(commute.weekInfo.days[5]));
         values.put(Cols.SATURDAY, boolToInt(commute.weekInfo.days[6]));
+        values.put(Cols.TONE, commute.alarmTone);
+        values.put(Cols.TONEPATH, commute.alarmTonePath);
         values.put(Cols.ACTIVE, boolToInt(commute.active));
         return values;
     }
@@ -229,9 +234,11 @@ public class Content implements Serializable {
         public Alarm[] alarms = new Alarm[14];
         public Context context;
         public boolean active;
+        public String alarmTone = "Silent";
+        public String alarmTonePath = "";
 
         public Commute(String id, String destination, int arrivalTimeHour,
-                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, Context c) {
+                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, String alarmTone, String alarmTonePath, Context c) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -246,7 +253,8 @@ public class Content implements Serializable {
             this.UUID = 0;
             this.context = c;
             this.active = active;
-
+            this.alarmTone = alarmTone;
+            this.alarmTonePath = alarmTonePath;
 
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
@@ -273,7 +281,7 @@ public class Content implements Serializable {
 
         public Commute(String id, String destination, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
-                       int uuid, boolean active, Context c) {
+                       int uuid, boolean active, String alarmTone, String alarmTonePath,Context c) {
             this.id = id;
             this.destination = destination;
             this.arrivalTimeHour = arrivalTimeHour;
@@ -289,6 +297,8 @@ public class Content implements Serializable {
             this.UUID = uuid;
             this.context = c;
             this.active = active;
+            this.alarmTone = alarmTone;
+            this.alarmTonePath = alarmTonePath;
 
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {

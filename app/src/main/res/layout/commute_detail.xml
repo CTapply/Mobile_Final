@@ -91,6 +91,31 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:text="@string/ringTone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+            android:layout_weight="1"
+            android:paddingStart="5dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:text="Silent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/alarmToneName"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:paddingStart="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
             android:text="@string/destination"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

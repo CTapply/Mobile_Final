@@ -98,6 +98,8 @@ public class CommuteListActivity extends AppCompatActivity {
                     week,
                     passedIntent.getIntExtra("UUID", -1),
                     passedIntent.getBooleanExtra("true", true),
+                    passedIntent.getStringExtra("alarmTone"),
+                    passedIntent.getStringExtra("alarmTonePath"),
                     mContext
             );
             toUpdate.updateCommute();
@@ -137,6 +139,8 @@ public class CommuteListActivity extends AppCompatActivity {
                 int arrMin = data.getIntExtra("arr_min", 0);
                 int prepMins = data.getIntExtra("prep_mins", 0);
                 String destination = data.getStringExtra("destination");
+                String tone = data.getStringExtra("alarmTone");
+                String tonePath = data.getStringExtra("alarmTonePath");
 
                 boolean sunday = data.getBooleanExtra("sunday", false);
                 boolean monday = data.getBooleanExtra("monday", false);
@@ -149,7 +153,7 @@ public class CommuteListActivity extends AppCompatActivity {
 
                 WeeklyInfo w = makeWeek(sunday, monday, tuesday, wednesday, thursday, friday, saturday, repeat);
 
-                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w, true, this);
+                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w, true, tone, tonePath, this);
                 Context mContext = getApplicationContext();
                 SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
                 addItem(newCommute, mDatabase);
@@ -225,6 +229,7 @@ public class CommuteListActivity extends AppCompatActivity {
 
             // Sets the name of the Commute in the list
             holder.mContentView.setText(holder.mCommute.id);
+            holder.mTimeView.setText(holder.mCommute.semanticTime());
 
             //If the commute is active, we then set the colors and Switch as active
             if (holder.mCommute.active) {
@@ -345,6 +350,7 @@ public class CommuteListActivity extends AppCompatActivity {
             final View mView;
             final TextView mContentView;
             final Switch mAlarmSwitch;
+            final TextView mTimeView;
 //            final ImageView mAlarmRepeat;
             final TextView mSunday, mMonday, mTuesday, mWednesday, mThursday, mFriday, mSaturday;
             final LinkedList<TextView> mDayList = new LinkedList<>();
@@ -355,6 +361,7 @@ public class CommuteListActivity extends AppCompatActivity {
                 mView = view;
 //                mIdView = (TextView) view.findViewById(R.id.id);
                 mContentView = (TextView) view.findViewById(R.id.content);
+                mTimeView = (TextView) view.findViewById(R.id.timeTextView);
                 mAlarmSwitch = (Switch) view.findViewById(R.id.alarmSwitch);
 //                mAlarmRepeat = (ImageView) view.findViewById(R.id.alarmRepeat);
                 mSunday = (TextView) view.findViewById(R.id.textViewSun);

@@ -71,6 +71,7 @@ public class CommuteDetailFragment extends Fragment {
             ((TextView) rootView.findViewById(R.id.textView2)).setText(mItem.id);
             ((TextView) rootView.findViewById(R.id.textView4)).setText(mItem.semanticTime());
             ((TextView) rootView.findViewById(R.id.textView6)).setText(mItem.semanticPrepTime());
+            ((TextView) rootView.findViewById(R.id.alarmToneName)).setText(mItem.alarmTone);
             ((TextView) rootView.findViewById(R.id.textView8)).setText(mItem.destination);
             ((TextView) rootView.findViewById(R.id.textView10)).setText(mItem.weekInfo.toString());
 //            CheckBox alarmArmed = ((CheckBox) rootView.findViewById(R.id.AlarmCheckbox));
@@ -113,6 +114,8 @@ public class CommuteDetailFragment extends Fragment {
                     editCommuteIntent.putExtra("friday", mItem.weekInfo.days[5]);
                     editCommuteIntent.putExtra("saturday", mItem.weekInfo.days[6]);
                     editCommuteIntent.putExtra("repeat", mItem.weekInfo.repeat);
+                    editCommuteIntent.putExtra("alarmTone", mItem.alarmTone);
+                    editCommuteIntent.putExtra("alarmTonePath", mItem.alarmTonePath);
                     startActivity(editCommuteIntent);
                 }
             });

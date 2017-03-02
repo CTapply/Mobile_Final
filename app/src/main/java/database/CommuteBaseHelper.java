@@ -36,7 +36,9 @@ public class CommuteBaseHelper extends SQLiteOpenHelper {
                 CommuteTable.Cols.THURSDAY + ", " +
                 CommuteTable.Cols.FRIDAY + ", " +
                 CommuteTable.Cols.SATURDAY + ", " +
-                CommuteTable.Cols.ACTIVE +
+                CommuteTable.Cols.ACTIVE + ", " +
+                CommuteTable.Cols.TONE + ", " +
+                CommuteTable.Cols.TONEPATH +
                 ")");
 
     }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Final Prototype</string>
+    <string name="app_name">SmartCommute</string>
     <string name="title_commute_detail">Commute Details</string>
     <string name="commute_name">Commute Name:</string>
     <string name="arr_time">Arrival Time:</string>
@@ -10,6 +10,8 @@
     <string name="delete_commute">Delete Commute</string>
     <string name="choose_arr_time">Choose Arrival Time</string>
     <string name="choose_prep_time">Choose Preparation Time</string>
+    <string name="ringTone">Alarm Tone:</string>
+    <string name="ringToneButtonText">Choose Alarm Tone</string>
     <string name="choose_destination">Choose Destination</string>
     <string name="enter_commute_name">Enter Commute Name</string>
     <string name="days_of_week">Days of the Week:</string>
@@ -17,6 +19,8 @@
     <string name="days">Days:</string>
     <string name="alarm">Alarm!</string>
     <string name="edit">Edit</string>
+    <string name="alarmDepart">Begin Departure</string>
+    <string name="alarmWakeUp">Wake Up!</string>
     <string name="m">M</string>
     <string name="t">T</string>
     <string name="w">W</string>

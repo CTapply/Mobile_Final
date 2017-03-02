@@ -26,13 +26,15 @@ import java.util.Calendar;
 public class AlarmAlertActivity extends Activity {
 
     private Alarm alarm;
+    private String destination;
 //    private MediaPlayer mediaPlayer;
 
 
     private Vibrator vibrator;
 
     private boolean alarmActive;
-    private Button dismissButton = (Button) findViewById(R.id.dismissButton);
+    private Button dismissButton;
+    private Button directionsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +49,47 @@ public class AlarmAlertActivity extends Activity {
 
         Bundle bundle = this.getIntent().getExtras();
         alarm = (Alarm) bundle.getSerializable("alarm");
+        destination = bundle.getString("destination");
+
+        TextView alarmTime = (TextView) findViewById(R.id.textViewAlarmTime);
+        TextView alarmMessage = (TextView) findViewById(R.id.textViewAlarmName);
+
+        alarmTime.setText(semanticTime(alarm));
+        alarmMessage.setText(R.string.alarmWakeUp); // Wake up by default
+
+        dismissButton = (Button) findViewById(R.id.dismissButton);
+        directionsButton = (Button) findViewById(R.id.directionsButton);
+        directionsButton.setVisibility(View.INVISIBLE); // Hidden by default
+
+
+        if (alarm.type >= 7 && alarm.type < 14) {
+            // This is the depart alarm
+            alarmMessage.setText(R.string.alarmDepart);
+            directionsButton.setVisibility(View.VISIBLE);
+        }
+
 
 //        this.setTitle(alarm.getAlarmName());
 
-        dismissButton.setOnClickListener(new View.OnClickListener() {
+        directionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                stopAlarm();
                 // Google Maps Launch Turn-By-Turn Navigation:
                 // https://developers.google.com/maps/documentation/android-api/intents
                 // TODO: Pass commute destination address instead of exampleLocation
-                String exampleLocation = "Sole Proprietor, Worcester MA";
+                String exampleLocation = destination;
                 Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(exampleLocation));
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
+            }
+        });
+
+        dismissButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopAlarm();
             }
         });
         startAlarm();
@@ -130,7 +159,7 @@ public class AlarmAlertActivity extends Activity {
         super.onDestroy();
     }
 
-    public void stopAlarm(View v) {
+    public void stopAlarm() {
 //        alarmActive = false;
         if (vibrator != null)
             vibrator.cancel();
@@ -146,5 +175,26 @@ public class AlarmAlertActivity extends Activity {
         }
         this.finish();
 
+    }
+
+    public String semanticTime(Alarm a) {
+        String time = "";
+        String meridiam = "";
+        int hold = a.getAlarmTime().get(Calendar.HOUR_OF_DAY);
+        if(hold > 12){
+            meridiam = "PM";
+            time += Integer.toString(hold-12);
+        } else {
+            meridiam = "AM";
+            time += Integer.toString(hold);
+        }
+        time += ":";
+        hold = a.getAlarmTime().get(Calendar.MINUTE);
+        if(hold < 10){
+            time += Integer.toString(0);
+        }
+        time += Integer.toString(hold);
+        time += " " + meridiam;
+        return time;
     }
 }

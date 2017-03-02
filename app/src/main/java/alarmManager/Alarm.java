@@ -26,11 +26,11 @@ import java.util.Date;
 public class Alarm implements Serializable {
 
     public int arrivalHour;
-    private int arrivalMinutes;
+    public int arrivalMinutes;
     private int prepTimeInMinutes;
     public Calendar alarmTime = Calendar.getInstance();
     private int day;
-    private int type; // Saving type, if >= 7, then depart alarm, < 7 is wake up
+    public int type; // Saving type, if >= 7, then depart alarm, < 7 is wake up
     public boolean repeat;
 
     public boolean armed;
@@ -79,11 +79,9 @@ public class Alarm implements Serializable {
             alarmTime.set(Calendar.MINUTE, arrivalMinutes);
             alarmTime.set(Calendar.SECOND, 0);
 
-            System.out.println(alarmTime.getTime().toString());
+            alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes));
 
-            alarmTime.add(Calendar.MINUTE, -travelTime);
-
-            System.out.println(alarmTime.getTime().toString());
+            System.out.println("WAKE UP ALARM TIME " + alarmTime.get(Calendar.MINUTE));
 
         } else if ( type >= 7 && type < 14){ // DEPART ALARM
 
@@ -92,7 +90,9 @@ public class Alarm implements Serializable {
             alarmTime.set(Calendar.MINUTE, arrivalMinutes);
             alarmTime.set(Calendar.SECOND, 0);
 
-            alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes));
+            alarmTime.add(Calendar.MINUTE, -travelTime);
+
+            System.out.println("DEPART ALARM TIME " + alarmTime.get(Calendar.MINUTE));
 
         }
 
@@ -102,6 +102,7 @@ public class Alarm implements Serializable {
         this.armed = true;
         Intent intent = new Intent(context, AlarmAlertBroadcastReceiver.class);
         intent.putExtra("alarm", this);
+        intent.putExtra("destination", this.commute.destination);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,PendingIntent.FLAG_CANCEL_CURRENT);
 

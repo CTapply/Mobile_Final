@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/listBackground">
+
+    <TextView
+        android:text="Select an Alarm Tone:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView13"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:background="#E1F5FE"
+        android:paddingBottom="10dp"
+        android:paddingLeft="5dp"
+        android:textStyle="normal|bold" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:id="@+id/toneList"
+        android:layout_height="400dp" />
+
+    <Button
+        android:text="Select Alarm Tone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/selectTone"
+        android:layout_margin="10dp"
+        android:background="@android:color/holo_green_dark" />
+</LinearLayout>

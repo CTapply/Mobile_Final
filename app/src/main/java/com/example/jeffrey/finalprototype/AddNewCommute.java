@@ -3,7 +3,12 @@ package com.example.jeffrey.finalprototype;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,14 +19,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static com.example.jeffrey.finalprototype.Content.Tones;
 
 
 /**
@@ -37,7 +50,13 @@ public class AddNewCommute extends FragmentActivity{
     TextView selectedArrTime;
     TextView selectedPrepTime;
     TextView selectedDestination;
+    TextView selectedTone;
     boolean editMode;
+    public String alarmTone = "";
+    public String alarmTonePath = "";
+    public static CountDownTimer alarmToneTimer;
+    public static MediaPlayer mediaPlayer;
+    public static int selectedPosition = 0; // 0 so its silent by default
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -48,9 +67,11 @@ public class AddNewCommute extends FragmentActivity{
         selectedArrTime = (TextView) findViewById(R.id.selectedArrTime);
         selectedPrepTime = (TextView) findViewById(R.id.selectedPrepTime);
         selectedDestination = (TextView) findViewById(R.id.selectedDestination);
+        selectedTone = (TextView) findViewById(R.id.ringToneText);
 
         Button arrTimeButton = (Button) findViewById(R.id.chooseArrTimeButton);
         Button prepTimeButton = (Button) findViewById(R.id.choosePrepTimeButton);
+        Button ringToneButton = (Button) findViewById(R.id.ringToneButton);
         Button destButton = (Button) findViewById(R.id.chooseDestButton);
         Button addButton = (Button) findViewById(R.id.addCommuteButton);
 
@@ -85,6 +106,8 @@ public class AddNewCommute extends FragmentActivity{
             thursday.setChecked(passedIntent.getBooleanExtra("thursday", false));
             friday.setChecked(passedIntent.getBooleanExtra("friday", false));
             saturday.setChecked(passedIntent.getBooleanExtra("saturday", false));
+            selectedTone.setText(passedIntent.getStringExtra("alarmTone"));
+            alarmTonePath = passedIntent.getStringExtra("alarmTonePath");
 //            repeat.setChecked(passedIntent.getBooleanExtra("repeat", false));
         }
 
@@ -113,6 +136,9 @@ public class AddNewCommute extends FragmentActivity{
                 addCommute.putExtra("thursday", thursday.isChecked());
                 addCommute.putExtra("friday", friday.isChecked());
                 addCommute.putExtra("saturday", saturday.isChecked());
+                addCommute.putExtra("alarmTone", selectedTone.getText().toString());
+                addCommute.putExtra("alarmTonePath", alarmTonePath);
+
                 addCommute.putExtra("repeat", true);
 
                 if(editMode){
@@ -128,6 +154,49 @@ public class AddNewCommute extends FragmentActivity{
         });
 
         checkLocationPermission();
+
+        /**
+         *
+         */
+        ringToneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                AlertDialog.Builder mBuidler = new AlertDialog.Builder(AddNewCommute.this);
+                final View mView = getLayoutInflater().inflate(R.layout.activity_pick_ringtone, null);
+                mBuidler.setView(mView);
+                mDialog = mBuidler.create();
+
+                Tones = new AlarmTone(getApplicationContext());
+
+                mView.setBackgroundColor(Color.parseColor("#E1F5FE"));
+
+                ListView list = (ListView) mView.findViewById(R.id.toneList);
+                Button selectButton = (Button) mView.findViewById(R.id.selectTone);
+
+                RingToneAdapter toneAdapter = new RingToneAdapter(getApplicationContext(), new ArrayList<String>(Arrays.asList(Tones.alarmTones)));
+
+                System.out.println("TONE ADAPTER" + toneAdapter);
+                list.setAdapter(toneAdapter);
+
+                selectButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        alarmTone = Tones.alarmTones[selectedPosition];
+                        alarmTonePath = Tones.alarmTonePaths[selectedPosition];
+                        selectedTone.setText(alarmTone);
+
+                        mDialog.dismiss();
+                    }
+                });
+
+
+
+                mDialog.show();
+            }
+        });
+
 
         /**
          * This shows the dialog box for choosing Preparation time
