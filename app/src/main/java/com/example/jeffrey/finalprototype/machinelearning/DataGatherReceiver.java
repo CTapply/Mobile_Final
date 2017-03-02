@@ -5,15 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 /**
  * Simply updates our training data with the parameters we classify
  * Created by Gatrie on 3/1/2017.
  */
+
+// we need to get the current prep_time field from the commute this da
+// then we need to update that field based on the machine learning stuff
 
 public class DataGatherReceiver extends BroadcastReceiver {
 
