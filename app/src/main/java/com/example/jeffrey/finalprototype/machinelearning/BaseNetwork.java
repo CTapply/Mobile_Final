@@ -39,8 +39,9 @@ public class BaseNetwork {
         network.reset();
 
         // create a training data set
-        BasicMLDataSet trainingSet = new BasicMLDataSet(XORInput, XOROutput);
+        BasicMLDataSet trainingSet = new BasicMLDataSet(XORInput, null);
         ResilientPropagation train = new ResilientPropagation(network, trainingSet);
+        //BasicMLDataSet set = new BasicMLDataSet()
 
         // Train!
         int epoch = 1 ;
@@ -132,3 +133,15 @@ public class BaseNetwork {
 
         : Does this mean that we re-train the network every single time???
  */
+
+/**
+private int input[][] = {
+        {expected_time, last_prep}
+}
+
+private int output[][] = {
+        {actual_time}
+}
+
+        prep = actual_time + snow_delay
+*/

@@ -3,12 +3,11 @@ package geofence;
 import android.app.IntentService;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.widget.Toast;
 
-import com.example.jeffrey.finalprototype.CommuteListActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -32,7 +31,6 @@ public class GeofenceTransitionIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
-        // Error checking ???
 
         // Get the transition type.
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
@@ -61,13 +59,22 @@ public class GeofenceTransitionIntentService extends IntentService {
      * @param transitionDetails in format transitionString:geofenceID
      */
     private void sendNotification(String transitionDetails){
-        Intent intent = new Intent(getApplicationContext(), CommuteListActivity.class); // create an intent to send to commute list
+        Intent intent = new Intent(); // create an intent to send to commute list
+        intent.setAction("GEOFENCE");
 
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int minutes = Calendar.getInstance().get(Calendar.MINUTE);
 
+        // get day of the week as string
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
+        String dayOfWeek = dateFormat.format(c.getTime());
+
         intent.putExtra("hour", hour);
         intent.putExtra("minute", minutes);
+        intent.putExtra("day", dayOfWeek);
+
+        sendBroadcast(intent);
     }
 
     /**

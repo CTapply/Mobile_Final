@@ -62,6 +62,11 @@
         </receiver>
 
         <service android:enabled="true" android:name="geofence.GeofenceTransitionIntentService"/>
+        <receiver android:name=".machinelearning.DataGatherReceiver">
+            <intent-filter>
+                <action android:name="GEOFENCE"/>
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name="alarmManager.AlarmAlertActivity"
