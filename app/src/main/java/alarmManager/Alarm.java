@@ -79,11 +79,7 @@ public class Alarm implements Serializable {
             alarmTime.set(Calendar.MINUTE, arrivalMinutes);
             alarmTime.set(Calendar.SECOND, 0);
 
-            System.out.println(alarmTime.getTime().toString());
-
             alarmTime.add(Calendar.MINUTE, -travelTime);
-
-            System.out.println(alarmTime.getTime().toString());
 
         } else if ( type >= 7 && type < 14){ // DEPART ALARM
 
@@ -94,6 +90,16 @@ public class Alarm implements Serializable {
 
             alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes));
 
+        } else if(type >= 14 && type < 21) {
+
+            alarmTime.set(Calendar.DAY_OF_WEEK, day+1); // +1 here because Calendar.SUNDAY = 1, not 0
+            alarmTime.set(Calendar.HOUR_OF_DAY, arrivalHour);
+            alarmTime.set(Calendar.MINUTE, arrivalMinutes);
+            alarmTime.set(Calendar.SECOND, 0);
+
+            alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes + 60)); // +60 so its 1 hour in advance
+
+
         }
 
     }
@@ -103,11 +109,23 @@ public class Alarm implements Serializable {
         Intent intent = new Intent(context, AlarmAlertBroadcastReceiver.class);
         intent.putExtra("alarm", this);
 
+        // Cancels the current alarm
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,PendingIntent.FLAG_CANCEL_CURRENT);
 
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        // Starts the new next alarm (if something changed)
+        if (type < 14) { // Want to go Wake the screen (goes to AlarmAlertBroadcastReceiver)
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
+        } else {
+            // this means the alarm isnt a real alarm, we dont want to wake the phone but we want
+            // to do the machine learning calculations
+            intent = new Intent(context, INSERTYOURBROADCASTRECEIVERHERETREVORTHANKSBUDDY.class);
+            intent.putExtra("alarm", this);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+            alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
+        }
     }
 
     public String getTimeUntilNextAlarmMessage(){

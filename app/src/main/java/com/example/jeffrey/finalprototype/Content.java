@@ -265,6 +265,11 @@ public class Content implements Serializable {
                     this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active);
                     this.alarms[i+7].setCommute(this);
                     this.alarms[i+7].setAlarmTime(c);
+
+                    // Machine Learning Alarms
+                    this.alarms[i+14] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+14, this.active);
+                    this.alarms[i+14].setCommute(this);
+                    this.alarms[i+14].setAlarmTime(c);
                 }
 
             }
@@ -309,6 +314,11 @@ public class Content implements Serializable {
                     this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active);
                     this.alarms[i+7].setCommute(this);
                     this.alarms[i+7].setAlarmTime(c);
+
+                    // Machine Learning Alarms
+                    this.alarms[i+14] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+14, this.active);
+                    this.alarms[i+14].setCommute(this);
+                    this.alarms[i+14].setAlarmTime(c);
                 }
             }
             if (this.active) {
