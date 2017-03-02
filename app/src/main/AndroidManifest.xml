@@ -66,6 +66,9 @@
             <intent-filter>
                 <action android:name="GEOFENCE"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="ALARM"/>
+            </intent-filter>
         </receiver>
 
         <activity

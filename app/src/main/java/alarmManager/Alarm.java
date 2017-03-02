@@ -14,6 +14,7 @@ import android.widget.ToggleButton;
 
 import com.example.jeffrey.finalprototype.CommuteListActivity;
 import com.example.jeffrey.finalprototype.Content.Commute;
+import com.example.jeffrey.finalprototype.machinelearning.DataGatherReceiver;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -120,11 +121,14 @@ public class Alarm implements Serializable {
         } else {
             // this means the alarm isnt a real alarm, we dont want to wake the phone but we want
             // to do the machine learning calculations
-            intent = new Intent(context, INSERTYOURBROADCASTRECEIVERHERETREVORTHANKSBUDDY.class);
-            intent.putExtra("alarm", this);
+            intent = new Intent();
+            intent.setAction("ALARM");
+            intent.putExtra("prep_time", this.prepTimeInMinutes);
+            intent.putExtra("commute_id", this.commute.id);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
+            context.sendBroadcast(intent);
         }
     }
 

@@ -227,9 +227,10 @@ public class Content implements Serializable {
         public String timeMode;
         public int preparationTime;
         public WeeklyInfo weekInfo;
-        // Alarms [0] - [6] are Wake up alarms
-        //        [7] - [13] are Depart alarms ( i%7 = day )
-        public Alarm[] alarms = new Alarm[14];
+        // Alarms [0]  - [6] are Wake up alarms
+        //        [7]  - [13] are Depart alarms ( i%7 = day )
+        //        [14] - [21] are machine learning alarms
+        public Alarm[] alarms = new Alarm[21];
         public Context context;
         public boolean active;
 

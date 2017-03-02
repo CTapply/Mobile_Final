@@ -51,6 +51,8 @@ public class GeofenceTransitionIntentService extends IntentService {
         } else {
             // Log the error.
         }
+
+        sendNotification("");
     }
 
     /**
