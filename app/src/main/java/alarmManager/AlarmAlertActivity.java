@@ -27,7 +27,7 @@ public class AlarmAlertActivity extends Activity {
 
     private Alarm alarm;
     private String destination;
-//    private MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer;
 
 
     private Vibrator vibrator;
@@ -77,7 +77,6 @@ public class AlarmAlertActivity extends Activity {
                 stopAlarm();
                 // Google Maps Launch Turn-By-Turn Navigation:
                 // https://developers.google.com/maps/documentation/android-api/intents
-                // TODO: Pass commute destination address instead of exampleLocation
                 String exampleLocation = destination;
                 Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(exampleLocation));
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -109,26 +108,26 @@ public class AlarmAlertActivity extends Activity {
             vibrator.vibrate(pattern, 0);
         }
 
-//        if (alarm.getAlarmTonePath() != "") {
-//            mediaPlayer = new MediaPlayer();
-//            if (true) { // Probably want to allow them to turn off vibrate??
-//                vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-//                long[] pattern = { 1000, 200, 200, 200 };
-//                vibrator.vibrate(pattern, 0);
-//            }
-//            try {
-//                mediaPlayer.setVolume(1.0f, 1.0f);
-//                mediaPlayer.setDataSource(this, Uri.parse(alarm.getAlarmTonePath()));
-//                mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-//                mediaPlayer.setLooping(true);
-//                mediaPlayer.prepare();
-//                mediaPlayer.start();
-//
-//            } catch (Exception e) {
-//                mediaPlayer.release();
-//                alarmActive = false;
-//            }
-//        }
+        if (alarm.alarmTonePath != "") {
+            mediaPlayer = new MediaPlayer();
+            if (true) { // Probably want to allow them to turn off vibrate??
+                vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                long[] pattern = { 1000, 200, 200, 200 };
+                vibrator.vibrate(pattern, 0);
+            }
+            try {
+                mediaPlayer.setVolume(1.0f, 1.0f);
+                mediaPlayer.setDataSource(this, Uri.parse(alarm.alarmTonePath));
+                mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                mediaPlayer.setLooping(true);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+
+            } catch (Exception e) {
+                mediaPlayer.release();
+                alarmActive = false;
+            }
+        }
 
     }
 
@@ -147,12 +146,12 @@ public class AlarmAlertActivity extends Activity {
 
         }
         try {
-//            mediaPlayer.stop();
+            mediaPlayer.stop();
         } catch (Exception e) {
 
         }
         try {
-//            mediaPlayer.release();
+            mediaPlayer.release();
         } catch (Exception e) {
 
         }
@@ -160,16 +159,16 @@ public class AlarmAlertActivity extends Activity {
     }
 
     public void stopAlarm() {
-//        alarmActive = false;
+        alarmActive = false;
         if (vibrator != null)
             vibrator.cancel();
         try {
-//            mediaPlayer.stop();
+            mediaPlayer.stop();
         } catch (IllegalStateException ise) {
 
         }
         try {
-//            mediaPlayer.release();
+            mediaPlayer.release();
         } catch (Exception e) {
 
         }

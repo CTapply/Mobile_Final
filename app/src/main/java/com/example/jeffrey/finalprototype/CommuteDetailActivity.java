@@ -25,16 +25,6 @@ public class CommuteDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent editCommuteIntent = new Intent(view.getContext(), AddNewCommute.class);
-//                editCommuteIntent.putExtra("EDIT_MODE", true);
-//                startActivity(editCommuteIntent);
-//            }
-//        });
-
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

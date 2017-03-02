@@ -275,11 +275,9 @@ public class CommuteListActivity extends AppCompatActivity {
                     if (holder.mAlarmSwitch.isChecked()) {
                         holder.mCommute.activateAlarms();
 
-                        // TODO We probably want to update the DB here (Though it could be very slow, if its a problem we can find another spot)
                     } else {
                         holder.mCommute.disarmAlarms();
 
-                        // TODO We probably want to update the DB here (Though it could be very slow, if its a problem we can find another spot)
                     }
 
                     // Call the service

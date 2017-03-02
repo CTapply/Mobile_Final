@@ -12,7 +12,6 @@ import android.os.Bundle;
 public class AlarmAlertBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println("Inside of AlarmAlertBroadcastReceiver onReceive");
         Intent AlarmServiceIntent = new Intent(context, AlarmServiceReceiver.class);
         context.sendBroadcast(AlarmServiceIntent, null);
 

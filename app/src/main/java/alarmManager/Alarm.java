@@ -32,17 +32,19 @@ public class Alarm implements Serializable {
     private int day;
     public int type; // Saving type, if >= 7, then depart alarm, < 7 is wake up
     public boolean repeat;
+    public String alarmTonePath;
 
     public boolean armed;
     public transient Commute commute;
 
-    public Alarm(int arrivalHour, int arrivalMinutes, int prepTimeInMinutes, int type, boolean armed) {
+    public Alarm(int arrivalHour, int arrivalMinutes, int prepTimeInMinutes, int type, boolean armed, String alarmTonePath) {
         this.arrivalHour = arrivalHour;
         this.arrivalMinutes = arrivalMinutes;
         this.prepTimeInMinutes = prepTimeInMinutes;
         this.day = type%7;
         this.type = type;
         this.armed = armed;
+        this.alarmTonePath = alarmTonePath;
     }
 
     /**

@@ -78,13 +78,9 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(this.getClass().getSimpleName(),"onStartCommand()");
-        System.out.println("Inside of onStartCommand for AlarmService");
         Alarm alarm = getNext();
         if(alarm != null){
-            System.out.println("Alarm Hour set to: " + alarm.arrivalHour);
             alarm.scheduleAlarm(getApplicationContext());
-//            Log.d(this.getClass().getSimpleName(),alarm.getTimeUntilNextAlarmMessage());
 
         }else{
             Intent myIntent = new Intent(getApplicationContext(), AlarmAlertBroadcastReceiver.class);
