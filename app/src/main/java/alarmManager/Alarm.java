@@ -1,12 +1,17 @@
 package alarmManager;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.PowerManager;
+import android.os.StrictMode;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
@@ -14,6 +19,10 @@ import android.widget.ToggleButton;
 
 import com.example.jeffrey.finalprototype.CommuteListActivity;
 import com.example.jeffrey.finalprototype.Content.Commute;
+import com.example.jeffrey.finalprototype.DirectionsHttpClient;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -66,13 +75,68 @@ public class Alarm implements Serializable {
          * Starts the alarm for the first time, should only call this in the constructor for the alarm (and possibly on system boot)
          */
     public void setAlarmTime(Context context) {
-        System.out.println("Inside of setAlarm");
+        int travelTime;
+        String DIRECTIONS_API_URL = "https://maps.googleapis.com/maps/api/directions/json?";
+        String origin;
+        String destination;
+        String key = "&key=AIzaSyCqpUlcpi5O_oYuB5KfqF4C_e0Er5c5n1E";
 
         // TODO: We need to do the calculation for when alarms are set and use as 2nd parameter
         //Currently setting the alarm to the time they need to be at work PLEASE CHANGE
 
-        // ASSUME 20 MINUTE TRAVEL TIME FOR NOW
-        int travelTime = 20;
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        // Get current location Latitute and Longitute
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            double longitude = location.getLongitude();
+            double latitude = location.getLatitude();
+            origin = "origin=" + latitude + "," + longitude;
+
+            // Set Destination
+            destination = "&destination=";
+            destination = destination + commute.destination.replaceAll("\\s","");
+
+            // Ask google to get directions from current location to the destination via car (default is driving)
+            String REQUEST = DIRECTIONS_API_URL + origin + destination + key;
+
+            DirectionsHttpClient client = new DirectionsHttpClient();
+            String response = client.getDirectionData(REQUEST);
+
+
+
+            if (response.equals("")) {
+                // Could not connect so set to the default
+                // TODO asdkasjd lkjsdf;dsalkfj sdflkj sf
+                travelTime = 20;
+            } else {
+
+
+                try {
+                    JSONObject respJson = new JSONObject(response);
+
+                    JSONObject routesJson = respJson.getJSONArray("routes").getJSONObject(0);
+                    JSONObject legsJson = routesJson.getJSONArray("legs").getJSONObject(0);
+                    JSONObject durationJson = legsJson.getJSONObject("duration");
+//                JSONObject valueJson = durationJson.getJSONObject("value");
+                    travelTime = durationJson.getInt("value") / 60; // Divide by 60 since we get the value in seconds
+                    System.out.println("Travel Estimate from Google Directions: " + travelTime);
+
+                } catch (JSONException e) {
+                    // TODO asdasdahsdhasdjashdas
+                    travelTime = 20;
+                }
+            }
+
+
+        } else {
+            // We cant get current location so we cant find the route time, so we should use time from previous travels
+            // TODO lskjfhsad kjlhfl kasdhflkj adslfkjhasd lkfjh asldkjhg askldfh klsadf
+            travelTime = 20;
+        }
 
         if (type >= 0 && type < 7 ) { // WAKE UP ALARM
 

@@ -29,7 +29,7 @@ public class RingToneAdapter extends ArrayAdapter<String> {
     }
 
     @Override
-    public View getView(final int position, View view, ViewGroup parent) {
+    public View getView(final int position, View view, final ViewGroup parent) {
 
         String tone = getItem(position);
 
@@ -38,15 +38,12 @@ public class RingToneAdapter extends ArrayAdapter<String> {
         }
 
         TextView toneName = (TextView) view.findViewById(R.id.toneName);
-        // Set Background Colors to be swapping
+//         Set Background Colors to be swapping
         if (position % 2 == 1) {
             toneName.setBackgroundColor(Color.parseColor("#E1F5FE")); // Light
         } else {
             toneName.setBackgroundColor(Color.parseColor("#B3E5FC")); // Dark
         }
-
-
-
 
         toneName.setText(tone);
         toneName.setTextColor(Color.BLACK);

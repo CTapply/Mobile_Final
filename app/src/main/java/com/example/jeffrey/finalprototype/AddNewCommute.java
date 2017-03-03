@@ -178,6 +178,8 @@ public class AddNewCommute extends FragmentActivity{
 
                 System.out.println("TONE ADAPTER" + toneAdapter);
                 list.setAdapter(toneAdapter);
+                list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
 
                 selectButton.setOnClickListener(new View.OnClickListener() {
                     @Override
