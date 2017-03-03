@@ -146,7 +146,7 @@ public class Alarm implements Serializable {
             alarmTime.set(Calendar.MINUTE, arrivalMinutes);
             alarmTime.set(Calendar.SECOND, 0);
 
-            alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes));
+            alarmTime.add(Calendar.MINUTE, -(travelTime + 10 + prepTimeInMinutes));
 
             System.out.println("WAKE UP ALARM TIME " + alarmTime.get(Calendar.MINUTE));
 
@@ -157,7 +157,7 @@ public class Alarm implements Serializable {
             alarmTime.set(Calendar.MINUTE, arrivalMinutes);
             alarmTime.set(Calendar.SECOND, 0);
 
-            alarmTime.add(Calendar.MINUTE, -travelTime);
+            alarmTime.add(Calendar.MINUTE, -(travelTime + 10)); // +10 minutes so they get to work a little early
 
             System.out.println("DEPART ALARM TIME " + alarmTime.get(Calendar.MINUTE));
 
@@ -168,7 +168,7 @@ public class Alarm implements Serializable {
             alarmTime.set(Calendar.MINUTE, arrivalMinutes);
             alarmTime.set(Calendar.SECOND, 0);
 
-            alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes + 60)); // +60 so its 1 hour in advance
+            alarmTime.add(Calendar.MINUTE, -(travelTime + 10 + prepTimeInMinutes + 60)); // +60 so its 1 hour in advance
 
 
         }

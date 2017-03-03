@@ -330,7 +330,8 @@ public class AddNewCommute extends FragmentActivity{
         } else if (hours == 1) {
             prepTime += " hour ";
         } else {
-            // do nothing
+            // Reset prep time to empty
+            prepTime = "";
         }
         prepTime += Integer.toString(minutes);
         if (minutes == 1) {
