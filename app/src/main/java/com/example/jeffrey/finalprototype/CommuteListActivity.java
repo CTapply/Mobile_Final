@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.example.jeffrey.finalprototype.Content.Commute;
 import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
 import com.example.jeffrey.finalprototype.machinelearning.BaseNetwork;
+import com.example.jeffrey.finalprototype.machinelearning.DataGatherReceiver;
 import com.example.jeffrey.finalprototype.weather.JSONWeatherParser;
 import com.example.jeffrey.finalprototype.weather.WeatherHttpClient;
 import com.example.jeffrey.finalprototype.weather.model.Weather;
@@ -142,8 +143,8 @@ public class CommuteListActivity extends AppCompatActivity {
 
         callAlarmScheduleService();
 
-        // start geofence service if not already running
         if(!GeofenceTransitionIntentService.RUNNING) {
+            startService(new Intent(getBaseContext(), DataGatherReceiver.class));
             startService(new Intent(getBaseContext(), GeofenceTransitionIntentService.class));
             GeofenceTransitionIntentService.RUNNING = true;
         }

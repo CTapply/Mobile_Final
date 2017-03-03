@@ -22,7 +22,6 @@ import org.encog.util.csv.CSVFormat;
 import org.encog.util.csv.ReadCSV;
 
 import java.io.File;
-import java.io.IOException;
 
 import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
 
@@ -32,14 +31,25 @@ import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
 
 public class BaseNetwork extends BroadcastReceiver{
 
+    private final int FOLDS = 5;
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        System.out.println("MACHINE: Received broadcast from datagathereceiever");
         if(intent.getAction().equals("MACHINE")) {
-            try{
-                // Train the network
-                File trainingFile = new File(context.getFilesDir(), "training_data_fin.csv");
-                trainingFile.createNewFile(); // create new file if doesn't exist, otherwise open
+            int dataCount = 0;
 
+            // read the file first out of curiosity
+            String inputLine;
+            File trainingFile = null;
+            StringBuffer outStringBuf = new StringBuffer();
+            try {
+                trainingFile = new File(context.getFilesDir() + "/training_data_fin.csv");
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+            if(dataCount >= FOLDS) {
                 // Define the format of the data file.
                 // This area will change, depending on the columns and
                 // format of the file that you are trying to model.
@@ -94,11 +104,10 @@ public class BaseNetwork extends BroadcastReceiver{
                 helper.normalizeInputVector(line, input.getData(), false);
                 MLData output = bestMethod.compute(input);
 
-                setCommutePrep(intent.getStringExtra("commuteID"), helper.denormalizeOutputVectorToString(output)[0]); // set the commute to the predicted time
+                String calc = helper.denormalizeOutputVectorToString(output)[0];
+                setCommutePrep(intent.getStringExtra("commuteID"), calc); // set the commute to the predicted time
 
                 Encog.getInstance().shutdown(); // stop running the learning
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -110,7 +119,7 @@ public class BaseNetwork extends BroadcastReceiver{
     private void setCommutePrep(String commuteID, String finalPrepTime){
         for(Content.Commute c : COMMUTE_MAP.values()) {
             if (c.id.equals(commuteID)) {
-                c.preparationTime = Integer.parseInt(finalPrepTime);
+                c.preparationTime = (int)Double.parseDouble(finalPrepTime);
                 c.updateCommute();
             }
         }

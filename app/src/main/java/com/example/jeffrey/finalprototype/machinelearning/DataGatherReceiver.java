@@ -1,9 +1,12 @@
 package com.example.jeffrey.finalprototype.machinelearning;
 
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.IBinder;
 
 import com.example.jeffrey.finalprototype.Content;
 import com.example.jeffrey.finalprototype.weather.JSONWeatherParser;
@@ -12,14 +15,7 @@ import com.example.jeffrey.finalprototype.weather.model.Weather;
 
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import alarmManager.Alarm;
+import java.io.OutputStream;
 
 import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
 
@@ -27,80 +23,106 @@ import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
  * Simply updates our training data with the parameters we classify
  * Created by Gatrie on 3/1/2017.
  */
-public class DataGatherReceiver extends BroadcastReceiver {
-
+public class DataGatherReceiver extends Service {
+    private static BroadcastReceiver m_ScreenOffReceiver;
     private Integer hours, minutes, prepTime, newPrepTime, day;
     private Integer snowing = 0;
     private String commuteID;
-    private JSONWeatherTask task;
+    private DataGatherReceiver.JSONWeatherTask task;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals("GEOFENCE")) {
-            hours = intent.getIntExtra("hour", 0);
-            minutes = intent.getIntExtra("minute", 0);
-            day = intent.getIntExtra("day", 0);
+    public IBinder onBind(Intent arg0) {
+        return null;
+    }
 
-        } else if (intent.getAction().equals("ALARM")) {
-            commuteID = intent.getStringExtra("commuteID");
-            prepTime = intent.getIntExtra("prep_time", 0);
+    @Override
+    public void onCreate() {
+        registerScreenOffReceiver();
+    }
 
-            // We should see if is snowing today, this sets the snowing variable
-            String city = parseCity(intent.getStringExtra("destination"));
-            task = new JSONWeatherTask();
-            task.execute(new String[]{city});
-        }
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(m_ScreenOffReceiver);
+        m_ScreenOffReceiver = null;
+    }
 
-        // check if we have everything and should record data, it's late just let it happen
-        if(hours != null && minutes != null && day != null && prepTime != null && commuteID != null){
-            // calculate the actual prep time:
-            int extraTime = getExtraTime((hoursToMinutes(hours) + minutes));
-            int snowDelay = calcSnowDelay();
+    private void registerScreenOffReceiver() {
+        m_ScreenOffReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent.getAction().equals("GEOFENCE")) {
+                    hours = intent.getIntExtra("hour", 0);
+                    minutes = intent.getIntExtra("minute", 0);
+                    day = intent.getIntExtra("day", 0);
 
-            // now how do we estimate the new prep time?? Some fraction of the extra time?
-            // if we were late, give extra time; else, give slightly more
-            if(extraTime <= 0)
-                newPrepTime = prepTime - (int)Math.ceil(extraTime * 1.3) + snowDelay;
-            else
-                newPrepTime = prepTime + (int)Math.ceil(extraTime * 0.7) + snowDelay;
+                } else if (intent.getAction().equals("ALARM")) {
+                    commuteID = intent.getStringExtra("commuteID");
+                    prepTime = intent.getIntExtra("prep_time", 0);
 
-            // Update the training file
-            writeToFile(context);
+                    // We should see if is snowing today, this sets the snowing variable
+                    String city = parseCity(intent.getStringExtra("destination"));
+                    task = new DataGatherReceiver.JSONWeatherTask();
+                    task.execute(new String[]{city});
+                }
 
-            // Now call the machine learning model to get the true prep time
-            Intent intentMachine = new Intent();
-            intentMachine.setAction("MACHINE");
+                // check if we have everything and should record data, it's late just let it happen
+                if(hours != null && minutes != null && day != null && prepTime != null && commuteID != null){
+                    // calculate the actual prep time:
+                    int extraTime = getExtraTime((hoursToMinutes(hours) + minutes));
+                    int snowDelay = calcSnowDelay();
 
-            intentMachine.putExtra("prepTime", prepTime);
-            intentMachine.putExtra("day", day);
-            intentMachine.putExtra("snowfall", snowing);
-            intentMachine.putExtra("newPrepTime", newPrepTime);
-            intentMachine.putExtra("commuteID", commuteID);
+                    // now how do we estimate the new prep time?? Some fraction of the extra time?
+                    // if we were late, give extra time; else, give slightly more
+                    if(extraTime <= 0)
+                        newPrepTime = prepTime - (int)Math.ceil(extraTime * 1.3) + snowDelay;
+                    else
+                        newPrepTime = prepTime + (int)Math.ceil(extraTime * 0.7) + snowDelay;
 
-            context.sendBroadcast(intentMachine);
+                    // Update the training file
+                    writeToFile(context);
 
-            // cheese but this way we know when we have all of the data
-            resetValues();
-        }
+                    // Now call the machine learning model to get the true prep time
+                    Intent intentMachine = new Intent();
+                    intentMachine.setAction("MACHINE");
+
+                    intentMachine.putExtra("prepTime", "" + prepTime);
+                    intentMachine.putExtra("day", "" + day);
+                    intentMachine.putExtra("snowfall", "" + snowing);
+                    intentMachine.putExtra("newPrepTime", "" + newPrepTime);
+                    intentMachine.putExtra("commuteID", commuteID);
+
+                    context.sendBroadcast(intentMachine);
+
+                    // cheese but this way we know when we have all of the data
+                    resetValues();
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("GEOFENCE");
+        filter.addAction("ALARM");
+        registerReceiver(m_ScreenOffReceiver, filter);
     }
 
     private void writeToFile(Context context){
         try{
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("training_data_2.csv", Context.MODE_PRIVATE));
             StringBuilder sb = new StringBuilder();
+            OutputStream str = context.openFileOutput("training_data_fin.csv", MODE_APPEND);
 
-            // write to the file the fields we want; the first 3 are input and the last is output
-            sb.append(prepTime);
-            sb.append(',');
-            sb.append(day);
-            sb.append(',');
-            sb.append(snowing);
-            sb.append(',');
-            sb.append(newPrepTime);
-            sb.append('\n');
+                sb.append(prepTime);
+                sb.append(',');
+                sb.append(day);
+                sb.append(',');
+                sb.append(snowing);
+                sb.append(',');
+                sb.append(newPrepTime);
+                sb.append('\n');
 
-            outputStreamWriter.write(sb.toString());
-            outputStreamWriter.close();
+                System.out.println("WRITING: " + sb.toString());
+
+                str.write(sb.toString().getBytes());
+
+                str.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

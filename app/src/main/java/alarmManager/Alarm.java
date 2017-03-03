@@ -195,7 +195,7 @@ public class Alarm implements Serializable {
             intent = new Intent();
             intent.setAction("ALARM");
             intent.putExtra("prep_time", this.prepTimeInMinutes);
-            intent.putExtra("commute_id", this.commute.id);
+            intent.putExtra("commuteID", this.commute.id);
             intent.putExtra("destination", this.commute.destination);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
