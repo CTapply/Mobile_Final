@@ -41,15 +41,10 @@ public class Content implements Serializable {
      */
     public static Map<String, Commute> COMMUTE_MAP = new HashMap<String, Commute>();
 
-    private static final int COUNT = 25;
+    public static AlarmTone Tones;
 
-    static {
-        // Add some sample items.
-//        for (int i = 1; i <= COUNT; i++) {
-//            addItem(createDummyItem(i));
-//        }
-        //addItem(createDummyItem(1));
-    }
+
+    private static final int COUNT = 25;
 
     public static void addItem(Commute item, SQLiteDatabase db) {
         ITEMS.add(item);
@@ -89,6 +84,8 @@ public class Content implements Serializable {
         values.put(Cols.THURSDAY, boolToInt(commute.weekInfo.days[4]));
         values.put(Cols.FRIDAY, boolToInt(commute.weekInfo.days[5]));
         values.put(Cols.SATURDAY, boolToInt(commute.weekInfo.days[6]));
+        values.put(Cols.TONE, commute.alarmTone);
+        values.put(Cols.TONEPATH, commute.alarmTonePath);
         values.put(Cols.ACTIVE, boolToInt(commute.active));
         return values;
     }
@@ -233,9 +230,12 @@ public class Content implements Serializable {
         public Alarm[] alarms = new Alarm[21];
         public Context context;
         public boolean active;
+        public String alarmTone = "Silent";
+        public String alarmTonePath = "";
 
         public Commute(String id, String destination, double latitude, double longitude, int arrivalTimeHour,
-                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, Context c) {
+                       int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, String alarmTone, String alarmTonePath, Context c) {
+
             this.id = id;
             this.destination = destination;
             this.latitude = latitude;
@@ -252,18 +252,19 @@ public class Content implements Serializable {
             this.UUID = 0;
             this.context = c;
             this.active = active;
-
+            this.alarmTone = alarmTone;
+            this.alarmTonePath = alarmTonePath;
 
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
                 if (this.weekInfo.days[i] == true) {
                     // Wake up alarms
-                    this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active);
+                    this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active, this.alarmTonePath);
                     this.alarms[i].setCommute(this);
                     this.alarms[i].setAlarmTime(c);
 
                     // Depart Alarms
-                    this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active);
+                    this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active, this.alarmTonePath);
                     this.alarms[i+7].setCommute(this);
                     this.alarms[i+7].setAlarmTime(c);
 
@@ -284,7 +285,7 @@ public class Content implements Serializable {
 
         public Commute(String id, String destination, double latitude, double longitude, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
-                       int uuid, boolean active, Context c) {
+                       int uuid, boolean active, String alarmTone, String alarmTonePath,Context c) {
             this.id = id;
             this.destination = destination;
             this.latitude = latitude;
@@ -302,17 +303,19 @@ public class Content implements Serializable {
             this.UUID = uuid;
             this.context = c;
             this.active = active;
+            this.alarmTone = alarmTone;
+            this.alarmTonePath = alarmTonePath;
 
             // Set an alarm for each day of the
             for (int i = 0; i < this.weekInfo.days.length; i++) {
                 if (this.weekInfo.days[i] == true) {
                     // Wake up alarms
-                    this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active);
+                    this.alarms[i] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i, this.active, this.alarmTonePath);
                     this.alarms[i].setCommute(this);
                     this.alarms[i].setAlarmTime(c);
 
                     // Depart Alarms
-                    this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active);
+                    this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active, this.alarmTonePath);
                     this.alarms[i+7].setCommute(this);
                     this.alarms[i+7].setAlarmTime(c);
 

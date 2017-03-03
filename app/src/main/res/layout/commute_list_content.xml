@@ -35,24 +35,24 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:layout_marginTop="-8dp">
 
             <TextView
-                android:text="TextView"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView14"
-                android:layout_weight="1"
-                android:layout_width="100dp" />
+                android:id="@+id/timeTextView"
+                android:layout_width="wrap_content"
+                android:gravity="left"
+                android:layout_marginLeft="8dp" />
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginTop="-8dp">
+                android:layout_gravity="center">
 
                 <TextView
                     android:text="S"
@@ -104,6 +104,6 @@
                     android:layout_weight="1"
                     android:layout_margin="5dp" />
             </LinearLayout>
-        </LinearLayout>
+        </FrameLayout>
 
-    </LinearLayout>
+</LinearLayout>

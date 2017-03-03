@@ -12,19 +12,21 @@ import android.os.Bundle;
 public class AlarmAlertBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println("Inside of AlarmAlertBroadcastReceiver onReceive");
         Intent AlarmServiceIntent = new Intent(context, AlarmServiceReceiver.class);
         context.sendBroadcast(AlarmServiceIntent, null);
 
         StaticWakeLock.lockOn(context);
         Bundle bundle = intent.getExtras();
         final Alarm alarm = (Alarm) bundle.getSerializable("alarm");
+        final String destination = bundle.getString("destination");
+
 
         Intent AlertActivityIntent;
 
         AlertActivityIntent = new Intent(context, AlarmAlertActivity.class);
 
         AlertActivityIntent.putExtra("alarm", alarm);
+        AlertActivityIntent.putExtra("destination", destination);
 
         AlertActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

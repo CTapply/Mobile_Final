@@ -25,6 +25,8 @@ public class CommuteDbSchema {
             public static final String FRIDAY = "friday";
             public static final String SATURDAY = "saturday";
             public static final String ACTIVE = "active";
+            public static final String TONE = "tone";
+            public static final String TONEPATH = "tonepath";
         }
     }
 }

@@ -78,8 +78,6 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        System.out.println("Inside of onStartCommand for AlarmService");
         Alarm alarm = getNext();
         if(alarm != null){
             alarm.scheduleAlarm(getApplicationContext());
