@@ -55,53 +55,33 @@ public class DataGatherReceiver extends BroadcastReceiver {
         if(hours != null && minutes != null && day != null && prepTime != null && commuteID != null){
             // calculate the actual prep time:
             int extraTime = getExtraTime((hoursToMinutes(hours) + minutes));
+            int snowDelay = calcSnowDelay();
 
             // now how do we estimate the new prep time?? Some fraction of the extra time?
             // if we were late, give extra time; else, give slightly more
             if(extraTime <= 0)
-                newPrepTime = prepTime - (int)Math.ceil(extraTime * 1.3);
+                newPrepTime = prepTime - (int)Math.ceil(extraTime * 1.3) + snowDelay;
             else
-                newPrepTime = prepTime + (int)Math.ceil(extraTime * 0.7);
+                newPrepTime = prepTime + (int)Math.ceil(extraTime * 0.7) + snowDelay;
 
             // Update the training file
             writeToFile(context);
-            readFromFile(context);
 
-            // we need to set the commute to have this new prep time
-            setCommutePrep();
+            // Now call the machine learning model to get the true prep time
+            Intent intentMachine = new Intent();
+            intentMachine.setAction("MACHINE");
+
+            intentMachine.putExtra("prepTime", prepTime);
+            intentMachine.putExtra("day", day);
+            intentMachine.putExtra("snowfall", snowing);
+            intentMachine.putExtra("newPrepTime", newPrepTime);
+            intentMachine.putExtra("commuteID", commuteID);
+
+            context.sendBroadcast(intentMachine);
 
             // cheese but this way we know when we have all of the data
             resetValues();
         }
-    }
-
-    /**
-     * Reads from the csv file containing the training data and prints out to the console
-     * @param context
-     */
-    private void readFromFile(Context context){
-        InputStream inputStream = null;
-        try {
-            inputStream = context.openFileInput("training_data_2.csv");
-
-            if (inputStream != null) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append(receiveString);
-                }
-
-                inputStream.close();
-                System.out.println("RECEIVED: " + stringBuilder.toString());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
     }
 
     private void writeToFile(Context context){
@@ -144,7 +124,7 @@ public class DataGatherReceiver extends BroadcastReceiver {
             if(c.id.equals(this.commuteID)){
                 // use the user time to arrive to estimate the extra time
                 int arrivalCommute = hoursToMinutes(c.arrivalTimeHour) + c.arrivalTimeMin;
-                return arrivalTimeGeo - 5 - arrivalCommute;
+                return arrivalTimeGeo - 5 - arrivalCommute - 10;
             }
         }
 
@@ -178,16 +158,46 @@ public class DataGatherReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Set the commute to have the new prep time and also
-     * call to update the database entry
+     * Helper function for calcSnowDelay();
+     * Calculates the coefficient between [0.25, 1.25] based on the input latitude
+     * @param latitude Latitude in degrees of the selected location
+     * @return Coefficient in range [0.25, 1.25]
      */
-    private void setCommutePrep(){
+    public double calcCoefficient(double latitude){
+        final float latMax = 55, latMin = 20;
+        final float coefficientMax = 1.25f, coefficientMin = 0.25f;
+
+        /**
+         * We bind the range of the latitude between 55 degrees (Thompson, Manitoba)
+         * and 20 degrees (Mexico City) for simplicity. Anything above or below
+         * is set to these thresholds
+         */
+        if(latitude > latMax)
+            latitude = latMax;
+
+        if(latitude < latMin)
+            latitude = latMin;
+
+        // The offset is the amount per degree latitude we add to the coefficient
+        float offset = (coefficientMax - coefficientMin) / (latMax - latMin);
+
+        // Calculated coefficient based on the offset from the input latitude
+        double coefficient = coefficientMin + ((latMax - latitude) * offset);
+
+        return coefficient;
+    }
+
+    /**
+     * Calculate the snow delay time (in minutes) based on the latitude and amount of snowfall
+     * @return Number of minutes delayed by the snow
+     */
+    public int calcSnowDelay(){
         for(Content.Commute c : COMMUTE_MAP.values()) {
             if (c.id.equals(this.commuteID)) {
-                c.preparationTime = newPrepTime;
-                c.updateCommute();
+                return (int)(calcCoefficient(c.latitude)*(snowing + 10));
             }
         }
+        return 0;
     }
 
     /**
