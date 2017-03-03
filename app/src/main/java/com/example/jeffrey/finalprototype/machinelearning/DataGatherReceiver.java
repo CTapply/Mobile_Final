@@ -137,31 +137,14 @@ public class DataGatherReceiver extends BroadcastReceiver {
 
     /**
      * Calculate the travel time between their commute and when they enter the geofence
-     * @pararm arrivalTime Timestamp from geofence
      * @return Difference between departure alarm and geofence enter, tells us how much extra time we have leftover
      */
     private int getExtraTime(int arrivalTimeGeo){
         for(Content.Commute c : COMMUTE_MAP.values()){
             if(c.id.equals(this.commuteID)){
-                // we want to get the departure alarm for today
-                /**
-                int dayIndex = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-                Alarm commuteDeparture = c.alarms[14 % dayIndex - 1];
-
-                int hourDep = commuteDeparture.alarmTime.get(Calendar.HOUR_OF_DAY);
-                int minDep = commuteDeparture.alarmTime.get(Calendar.MINUTE);
-                minDep += hoursToMinutes(hourDep); // put it all into minutes
-
-                System.out.println("DEPARTURE: " + hourDep);
-                System.out.println("DEPARTURE: " + minDep);
-                 */
-
                 // use the user time to arrive to estimate the extra time
                 int arrivalCommute = hoursToMinutes(c.arrivalTimeHour) + c.arrivalTimeMin;
                 return arrivalTimeGeo - 5 - arrivalCommute;
-
-
-                // return arrivalTimeGeo - minDep;
             }
         }
 
@@ -218,11 +201,6 @@ public class DataGatherReceiver extends BroadcastReceiver {
 
             try {
                 weather = JSONWeatherParser.getWeather(data);
-
-                //System.out.println("WEATHER COND: " + weather.currentCondition.getDescr());
-                //System.out.println("WEATHER TEMP: " + weather.temperature.getTemp() + "F");
-                //System.out.println("SNOWFALL: " + weather.snow.getAmount());
-
                 snowing = (int)weather.snow.getAmount();
             } catch (JSONException e) {
                 e.printStackTrace();
