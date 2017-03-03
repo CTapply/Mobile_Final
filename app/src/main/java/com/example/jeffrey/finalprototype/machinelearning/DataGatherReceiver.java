@@ -23,7 +23,7 @@ import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
  */
 public class DataGatherReceiver extends BroadcastReceiver {
 
-    private Integer hours, minutes, prepTime, extraTime;
+    private Integer hours, minutes, prepTime, newPrepTime;
     private String day;
     private String commuteID;
 
@@ -32,7 +32,11 @@ public class DataGatherReceiver extends BroadcastReceiver {
         if(intent.getAction().equals("GEOFENCE")) {
             hours = intent.getIntExtra("hour", 0);
             minutes = intent.getIntExtra("minute", 0);
-            day = "" + intent.getStringExtra("day");
+            day = intent.getStringExtra("day");
+
+            // We should see if is snowing today
+
+
         } else if (intent.getAction().equals("ALARM")) {
             commuteID = intent.getStringExtra("commuteID");
             prepTime = intent.getIntExtra("prep_time", 0);
@@ -40,27 +44,34 @@ public class DataGatherReceiver extends BroadcastReceiver {
 
         // check if we have everything and should record data, it's late just let it happen
         if(hours != null && minutes != null && day != null && prepTime != null && commuteID != null){
-            // record data to the csv
-            writeToFile(context);
+            // calculate the actual prep time:
+            int extraTime = getExtraTime((hoursToMinutes(hours) + minutes));
 
-            // calculate the actual prep time
-            extraTime = getDepartureDifference((hoursToMinutes(hours) + minutes)) - 5 - prepTime;
+            // now how do we estimate the new prep time?? Some fraction of the extra time?
+            // if we were late, give extra time; else, give slightly more
+            if(extraTime <= 0)
+                newPrepTime = prepTime - (int)Math.ceil(extraTime * 1.3);
+            else
+                newPrepTime = prepTime + (int)Math.ceil(extraTime * 0.7);
 
             writeToFile(context);
             readFromFile(context);
+
 
             resetValues(); // cheese but this way we know when we have all of the data
         }
     }
 
-    // file reading
+    /**
+     * Reads from the csv file containing the training data and prints out to the console
+     * @param context
+     */
     private void readFromFile(Context context){
-        // read from it
         InputStream inputStream = null;
         try {
             inputStream = context.openFileInput("training_data.csv");
 
-            if ( inputStream != null ) {
+            if (inputStream != null) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 String receiveString = "";
@@ -85,15 +96,25 @@ public class DataGatherReceiver extends BroadcastReceiver {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("training_data.csv", Context.MODE_PRIVATE));
             StringBuilder sb = new StringBuilder();
 
+            /**
+             * learning parameters
+             *
+             * <input>
+             * prepTime,
+             * day (0, 1, 2, 3, 4, 5, 6)
+             * snowing (0 - no, 1 - yes)
+             *
+             * <output>
+             * newPrepTime --> should the output be the amount of "adjustment time"?
+             */
+
             sb.append(prepTime);
-            sb.append(',');
-            sb.append(minutes);
-            sb.append(',');
-            sb.append(hours);
             sb.append(',');
             sb.append(day);
             sb.append(',');
-            sb.append(extraTime);
+            // sb.append(snowing)
+            // sb.append(',')
+            sb.append(newPrepTime);
             sb.append('\n');
 
             outputStreamWriter.write(sb.toString());
@@ -115,12 +136,13 @@ public class DataGatherReceiver extends BroadcastReceiver {
     /**
      * Calculate the travel time between their commute and when they enter the geofence
      * @pararm arrivalTime Timestamp from geofence
-     * @return Difference between departure alarm and geofence enter
+     * @return Difference between departure alarm and geofence enter, tells us how much extra time we have leftover
      */
-    private int getDepartureDifference(int arrivalTime){
+    private int getExtraTime(int arrivalTimeGeo){
         for(Content.Commute c : COMMUTE_MAP.values()){
             if(c.id.equals(this.commuteID)){
                 // we want to get the departure alarm for today
+                /**
                 int dayIndex = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
                 Alarm commuteDeparture = c.alarms[14 % dayIndex - 1];
 
@@ -130,19 +152,28 @@ public class DataGatherReceiver extends BroadcastReceiver {
 
                 System.out.println("DEPARTURE: " + hourDep);
                 System.out.println("DEPARTURE: " + minDep);
+                 */
 
-                return arrivalTime - minDep;
+                // use the user time to arrive to estimate the extra time
+                int arrivalCommute = hoursToMinutes(c.arrivalTimeHour) + c.arrivalTimeMin;
+                return arrivalTimeGeo - 5 - arrivalCommute;
+
+
+                // return arrivalTimeGeo - minDep;
             }
         }
 
         return 0; // commute not found
     }
 
+    /**
+     * Reset our variables to anticipate the next set of data
+     */
     public void resetValues(){
         hours = null;
         minutes = null;
         prepTime = null;
-        extraTime = null;
+        newPrepTime = null;
         day = null;
         commuteID = null;
     }
