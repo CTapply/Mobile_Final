@@ -125,6 +125,7 @@ public class Alarm implements Serializable {
             intent.setAction("ALARM");
             intent.putExtra("prep_time", this.prepTimeInMinutes);
             intent.putExtra("commute_id", this.commute.id);
+            intent.putExtra("destination", this.commute.destination);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
             alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);

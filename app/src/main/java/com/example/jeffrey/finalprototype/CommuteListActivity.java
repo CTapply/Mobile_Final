@@ -416,28 +416,4 @@ public class CommuteListActivity extends AppCompatActivity {
             }
         }
     }
-
-    /**
-     * Private class for monitoring weather information in the background
-     * TODO: Push this into the machine learning code
-     */
-    private class JSONWeatherTask extends AsyncTask<String, Void, Weather> {
-        @Override
-        protected Weather doInBackground(String... params) {
-            Weather weather = new Weather();
-            String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
-
-            try {
-                weather = JSONWeatherParser.getWeather(data);
-
-                System.out.println("WEATHER COND: " + weather.currentCondition.getDescr());
-                System.out.println("WEATHER TEMP: " + weather.temperature.getTemp() + "F");
-                System.out.println("SNOWFALL: " + weather.snow.getAmount());
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return weather;
-        }
-    }
 }

@@ -3,8 +3,14 @@ package com.example.jeffrey.finalprototype.machinelearning;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 
 import com.example.jeffrey.finalprototype.Content;
+import com.example.jeffrey.finalprototype.weather.JSONWeatherParser;
+import com.example.jeffrey.finalprototype.weather.WeatherHttpClient;
+import com.example.jeffrey.finalprototype.weather.model.Weather;
+
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -23,23 +29,26 @@ import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
  */
 public class DataGatherReceiver extends BroadcastReceiver {
 
-    private Integer hours, minutes, prepTime, newPrepTime;
-    private String day;
+    private Integer hours, minutes, prepTime, newPrepTime, day;
+    private Integer snowing = 0;
     private String commuteID;
+    private JSONWeatherTask task;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals("GEOFENCE")) {
             hours = intent.getIntExtra("hour", 0);
             minutes = intent.getIntExtra("minute", 0);
-            day = intent.getStringExtra("day");
-
-            // We should see if is snowing today
-
+            day = intent.getIntExtra("day", 0);
 
         } else if (intent.getAction().equals("ALARM")) {
             commuteID = intent.getStringExtra("commuteID");
             prepTime = intent.getIntExtra("prep_time", 0);
+
+            // We should see if is snowing today, this sets the snowing variable
+            String city = parseCity(intent.getStringExtra("destination"));
+            task = new JSONWeatherTask();
+            task.execute(new String[]{city});
         }
 
         // check if we have everything and should record data, it's late just let it happen
@@ -54,11 +63,15 @@ public class DataGatherReceiver extends BroadcastReceiver {
             else
                 newPrepTime = prepTime + (int)Math.ceil(extraTime * 0.7);
 
+            // Update the training file
             writeToFile(context);
             readFromFile(context);
 
+            // we need to set the commute to have this new prep time
+            setCommutePrep();
 
-            resetValues(); // cheese but this way we know when we have all of the data
+            // cheese but this way we know when we have all of the data
+            resetValues();
         }
     }
 
@@ -69,7 +82,7 @@ public class DataGatherReceiver extends BroadcastReceiver {
     private void readFromFile(Context context){
         InputStream inputStream = null;
         try {
-            inputStream = context.openFileInput("training_data.csv");
+            inputStream = context.openFileInput("training_data_2.csv");
 
             if (inputStream != null) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -93,27 +106,16 @@ public class DataGatherReceiver extends BroadcastReceiver {
 
     private void writeToFile(Context context){
         try{
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("training_data.csv", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("training_data_2.csv", Context.MODE_PRIVATE));
             StringBuilder sb = new StringBuilder();
 
-            /**
-             * learning parameters
-             *
-             * <input>
-             * prepTime,
-             * day (0, 1, 2, 3, 4, 5, 6)
-             * snowing (0 - no, 1 - yes)
-             *
-             * <output>
-             * newPrepTime --> should the output be the amount of "adjustment time"?
-             */
-
+            // write to the file the fields we want; the first 3 are input and the last is output
             sb.append(prepTime);
             sb.append(',');
             sb.append(day);
             sb.append(',');
-            // sb.append(snowing)
-            // sb.append(',')
+            sb.append(snowing);
+            sb.append(',');
             sb.append(newPrepTime);
             sb.append('\n');
 
@@ -176,5 +178,56 @@ public class DataGatherReceiver extends BroadcastReceiver {
         newPrepTime = null;
         day = null;
         commuteID = null;
+    }
+
+    /**
+     * Pulls out the city name from the destination of the commute object to know which city to
+     * get weather data for
+     * @param destination Destination string from the place picker (stored in commute)
+     * @return City named in format: [city,state/country]
+     */
+    private String parseCity(String destination){
+        String[] strings = destination.split(",");
+        String city = strings[strings.length - 3].replace(" ", "");
+        String state = strings[strings.length -2].split(" ")[1].replace(" ", "");
+
+        return city + "," + state;
+    }
+
+    /**
+     * Set the commute to have the new prep time and also
+     * call to update the database entry
+     */
+    private void setCommutePrep(){
+        for(Content.Commute c : COMMUTE_MAP.values()) {
+            if (c.id.equals(this.commuteID)) {
+                c.preparationTime = newPrepTime;
+                c.updateCommute();
+            }
+        }
+    }
+
+    /**
+     * Private class for monitoring weather information in the background
+     */
+    private class JSONWeatherTask extends AsyncTask<String, Void, Weather> {
+        @Override
+        protected Weather doInBackground(String... params) {
+            Weather weather = new Weather();
+            String data = ( (new WeatherHttpClient()).getWeatherData(params[0]));
+
+            try {
+                weather = JSONWeatherParser.getWeather(data);
+
+                //System.out.println("WEATHER COND: " + weather.currentCondition.getDescr());
+                //System.out.println("WEATHER TEMP: " + weather.temperature.getTemp() + "F");
+                //System.out.println("SNOWFALL: " + weather.snow.getAmount());
+
+                snowing = (int)weather.snow.getAmount();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return weather;
+        }
     }
 }

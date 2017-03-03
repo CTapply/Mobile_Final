@@ -51,8 +51,6 @@ public class GeofenceTransitionIntentService extends IntentService {
         } else {
             // Log the error.
         }
-
-        sendNotification("");
     }
 
     /**
@@ -64,17 +62,9 @@ public class GeofenceTransitionIntentService extends IntentService {
         Intent intent = new Intent(); // create an intent to send to commute list
         intent.setAction("GEOFENCE");
 
-        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        int minutes = Calendar.getInstance().get(Calendar.MINUTE);
-
-        // get day of the week as string
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
-        String dayOfWeek = dateFormat.format(c.getTime());
-
-        intent.putExtra("hour", hour);
-        intent.putExtra("minute", minutes);
-        intent.putExtra("day", dayOfWeek);
+        intent.putExtra("hour", Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        intent.putExtra("minute", Calendar.getInstance().get(Calendar.MINUTE));
+        intent.putExtra("day", Calendar.DAY_OF_WEEK - 1);
 
         sendBroadcast(intent);
     }
