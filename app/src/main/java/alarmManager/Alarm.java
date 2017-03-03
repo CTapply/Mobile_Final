@@ -23,6 +23,7 @@ import com.example.jeffrey.finalprototype.DirectionsHttpClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.example.jeffrey.finalprototype.machinelearning.DataGatherReceiver;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -160,6 +161,16 @@ public class Alarm implements Serializable {
 
             System.out.println("DEPART ALARM TIME " + alarmTime.get(Calendar.MINUTE));
 
+        } else if(type >= 14 && type < 21) {
+
+            alarmTime.set(Calendar.DAY_OF_WEEK, day+1); // +1 here because Calendar.SUNDAY = 1, not 0
+            alarmTime.set(Calendar.HOUR_OF_DAY, arrivalHour);
+            alarmTime.set(Calendar.MINUTE, arrivalMinutes);
+            alarmTime.set(Calendar.SECOND, 0);
+
+            alarmTime.add(Calendar.MINUTE, -(travelTime + prepTimeInMinutes + 60)); // +60 so its 1 hour in advance
+
+
         }
 
     }
@@ -170,11 +181,27 @@ public class Alarm implements Serializable {
         intent.putExtra("alarm", this);
         intent.putExtra("destination", this.commute.destination);
 
+        // Cancels the current alarm
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,PendingIntent.FLAG_CANCEL_CURRENT);
 
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        // Starts the new next alarm (if something changed)
+        if (type < 14) { // Want to go Wake the screen (goes to AlarmAlertBroadcastReceiver)
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
+        } else {
+            // this means the alarm isnt a real alarm, we dont want to wake the phone but we want
+            // to do the machine learning calculations
+            intent = new Intent();
+            intent.setAction("ALARM");
+            intent.putExtra("prep_time", this.prepTimeInMinutes);
+            intent.putExtra("commute_id", this.commute.id);
+            intent.putExtra("destination", this.commute.destination);
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+            alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime.getTimeInMillis(), pendingIntent);
+            context.sendBroadcast(intent);
+        }
     }
 
     public String getTimeUntilNextAlarmMessage(){

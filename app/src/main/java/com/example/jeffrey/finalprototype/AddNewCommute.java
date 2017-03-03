@@ -51,6 +51,7 @@ public class AddNewCommute extends FragmentActivity{
     TextView selectedPrepTime;
     TextView selectedDestination;
     TextView selectedTone;
+    double selectedLatitude, selectedLongitude;
     boolean editMode;
     public String alarmTone = "";
     public String alarmTonePath = "";
@@ -99,6 +100,10 @@ public class AddNewCommute extends FragmentActivity{
             int prepMins = passedIntent.getIntExtra("prep_mins", 0);
             selectedPrepTime.setText(semanticPrep(prepMins/60, prepMins%60));
             selectedDestination.setText(passedIntent.getStringExtra("destination"));
+
+            selectedLatitude = passedIntent.getDoubleExtra("latitude", 0.0f);
+            selectedLongitude = passedIntent.getDoubleExtra("longitude", 0.0f);
+
             sunday.setChecked(passedIntent.getBooleanExtra("sunday", false));
             monday.setChecked(passedIntent.getBooleanExtra("monday", false));
             tuesday.setChecked(passedIntent.getBooleanExtra("tuesday", false));
@@ -129,6 +134,8 @@ public class AddNewCommute extends FragmentActivity{
                 addCommute.putExtra("arr_min", getMinFromTime(selectedArrTime.getText().toString()));
                 addCommute.putExtra("prep_mins", getPrepMins(selectedPrepTime.getText().toString()));
                 addCommute.putExtra("destination", selectedDestination.getText().toString());
+                addCommute.putExtra("latitude", selectedLatitude);
+                addCommute.putExtra("longitude", selectedLongitude);
                 addCommute.putExtra("sunday", sunday.isChecked());
                 addCommute.putExtra("monday", monday.isChecked());
                 addCommute.putExtra("tuesday", tuesday.isChecked());
@@ -270,6 +277,8 @@ public class AddNewCommute extends FragmentActivity{
             if(resultCode == Activity.RESULT_OK){
                 final Place place = PlacePicker.getPlace(this, data);
                 final CharSequence address = place.getAddress();
+                selectedLatitude = place.getLatLng().latitude;
+                selectedLongitude = place.getLatLng().longitude;
                 selectedDestination.setText(address);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result

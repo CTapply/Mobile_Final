@@ -74,6 +74,8 @@ public class Content implements Serializable {
         values.put(Cols.ARR_MIN, commute.arrivalTimeMin);
         values.put(Cols.PREP_MINS, commute.preparationTime);
         values.put(Cols.DESTINATION, commute.destination);
+        values.put(Cols.LATITUDE, commute.destination);
+        values.put(Cols.LONGITUDE, commute.destination);
         values.put(Cols.REPEAT, boolToInt(commute.weekInfo.repeat));
         values.put(Cols.SUNDAY, boolToInt(commute.weekInfo.days[0]));
         values.put(Cols.MONDAY, boolToInt(commute.weekInfo.days[1]));
@@ -216,23 +218,28 @@ public class Content implements Serializable {
         public final String id;
         public final int UUID;
         public String destination;
+        double latitude, longitude;
         public int arrivalTimeHour;
         public int arrivalTimeMin;
         public String timeMode;
         public int preparationTime;
         public WeeklyInfo weekInfo;
-        // Alarms [0] - [6] are Wake up alarms
-        //        [7] - [13] are Depart alarms ( i%7 = day )
-        public Alarm[] alarms = new Alarm[14];
+        // Alarms [0]  - [6] are Wake up alarms
+        //        [7]  - [13] are Depart alarms ( i%7 = day )
+        //        [14] - [21] are machine learning alarms
+        public Alarm[] alarms = new Alarm[21];
         public Context context;
         public boolean active;
         public String alarmTone = "Silent";
         public String alarmTonePath = "";
 
-        public Commute(String id, String destination, int arrivalTimeHour,
+        public Commute(String id, String destination, double latitude, double longitude, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo, boolean active, String alarmTone, String alarmTonePath, Context c) {
+
             this.id = id;
             this.destination = destination;
+            this.latitude = latitude;
+            this.longitude = longitude;
             this.arrivalTimeHour = arrivalTimeHour;
             this.arrivalTimeMin = arrivalTimeMin;
             this.preparationTime = preparationTime;
@@ -260,6 +267,11 @@ public class Content implements Serializable {
                     this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active, this.alarmTonePath);
                     this.alarms[i+7].setCommute(this);
                     this.alarms[i+7].setAlarmTime(c);
+
+                    // Machine Learning Alarms
+                    this.alarms[i+14] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+14, this.active);
+                    this.alarms[i+14].setCommute(this);
+                    this.alarms[i+14].setAlarmTime(c);
                 }
 
             }
@@ -271,11 +283,13 @@ public class Content implements Serializable {
 
         }
 
-        public Commute(String id, String destination, int arrivalTimeHour,
+        public Commute(String id, String destination, double latitude, double longitude, int arrivalTimeHour,
                        int arrivalTimeMin, int preparationTime, WeeklyInfo weekInfo,
                        int uuid, boolean active, String alarmTone, String alarmTonePath,Context c) {
             this.id = id;
             this.destination = destination;
+            this.latitude = latitude;
+            this.longitude = longitude;
             this.arrivalTimeHour = arrivalTimeHour;
             this.arrivalTimeMin = arrivalTimeMin;
             this.preparationTime = preparationTime;
@@ -304,6 +318,11 @@ public class Content implements Serializable {
                     this.alarms[i+7] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+7, this.active, this.alarmTonePath);
                     this.alarms[i+7].setCommute(this);
                     this.alarms[i+7].setAlarmTime(c);
+
+                    // Machine Learning Alarms
+                    this.alarms[i+14] = new Alarm(arrivalTimeHour, arrivalTimeMin, preparationTime, i+14, this.active);
+                    this.alarms[i+14].setCommute(this);
+                    this.alarms[i+14].setAlarmTime(c);
                 }
             }
             if (this.active) {

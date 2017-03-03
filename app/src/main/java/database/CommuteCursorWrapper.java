@@ -27,6 +27,8 @@ public class CommuteCursorWrapper extends CursorWrapper {
         int arr_min = getInt(getColumnIndex(CommuteTable.Cols.ARR_MIN));
         int prep_mins = getInt(getColumnIndex(CommuteTable.Cols.PREP_MINS));
         String destination = getString(getColumnIndex(CommuteTable.Cols.DESTINATION));
+        double latitude = getDouble(getColumnIndex(CommuteTable.Cols.LATITUDE));
+        double longitude = getDouble(getColumnIndex(CommuteTable.Cols.LONGITUDE));
         boolean repeat = getInt(getColumnIndex(CommuteTable.Cols.REPEAT)) > 0;
         boolean sunday = getInt(getColumnIndex(CommuteTable.Cols.SUNDAY)) > 0;
         boolean monday = getInt(getColumnIndex(CommuteTable.Cols.MONDAY)) > 0;
@@ -43,7 +45,7 @@ public class CommuteCursorWrapper extends CursorWrapper {
                 sunday, monday, tuesday, wednesday, thursday,
                 friday, saturday, repeat
         );
-        Commute c = new Commute(id, destination, arr_hour, arr_min, prep_mins, w, uuid, active,tone, tonepath, context);
+        Commute c = new Commute(id, destination, latitude, longitude, arr_hour, arr_min, prep_mins, w, uuid, active,tone, tonepath, context);
 
         return c;
     }

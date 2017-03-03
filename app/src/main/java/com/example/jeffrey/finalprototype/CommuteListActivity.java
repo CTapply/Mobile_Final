@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,7 +26,15 @@ import android.widget.Toast;
 
 import com.example.jeffrey.finalprototype.Content.Commute;
 import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
+import com.example.jeffrey.finalprototype.machinelearning.BaseNetwork;
+import com.example.jeffrey.finalprototype.weather.JSONWeatherParser;
+import com.example.jeffrey.finalprototype.weather.WeatherHttpClient;
+import com.example.jeffrey.finalprototype.weather.model.Weather;
 
+import org.json.JSONException;
+import com.google.android.gms.location.Geofence;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +44,8 @@ import alarmManager.AlarmServiceReceiver;
 import database.CommuteBaseHelper;
 import database.CommuteDbSchema;
 import database.CommuteDbSchema.CommuteTable;
+import geofence.GeofenceAssets;
+import geofence.GeofenceTransitionIntentService;
 
 import static com.example.jeffrey.finalprototype.Content.addItem;
 
@@ -47,6 +58,8 @@ import static com.example.jeffrey.finalprototype.Content.addItem;
  * item details side-by-side using two vertical panes.
  */
 public class CommuteListActivity extends AppCompatActivity {
+
+    String defaultCity = "Worcester,us";
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -74,7 +87,6 @@ public class CommuteListActivity extends AppCompatActivity {
 
             }
         });
-
         Context mContext = getApplicationContext();
         mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
         Intent passedIntent = getIntent();
@@ -92,6 +104,8 @@ public class CommuteListActivity extends AppCompatActivity {
             Commute toUpdate = new Commute(
                     passedIntent.getStringExtra("id"),
                     passedIntent.getStringExtra("destination"),
+                    passedIntent.getDoubleExtra("latitude", 0.0f),
+                    passedIntent.getDoubleExtra("longitude", 0.0f),
                     passedIntent.getIntExtra("arr_hour", 12),
                     passedIntent.getIntExtra("arr_min", 0),
                     passedIntent.getIntExtra("prep_mins", 0),
@@ -104,6 +118,7 @@ public class CommuteListActivity extends AppCompatActivity {
             );
             toUpdate.updateCommute();
         }
+
 
         Content.populate(this);
         View recyclerView = findViewById(R.id.commute_list);
@@ -118,9 +133,20 @@ public class CommuteListActivity extends AppCompatActivity {
             mTwoPane = true;
         }
 
+        /** Uncomment these two lines to test the weather task */
+        //JSONWeatherTask task = new JSONWeatherTask();
+        //task.execute(new String[]{defaultCity});
+
+        /** Uncomment this line to test a basic neural network */
+        //BaseNetwork net = new BaseNetwork();
+
         callAlarmScheduleService();
 
-
+        // start geofence service if not already running
+        if(!GeofenceTransitionIntentService.RUNNING) {
+            startService(new Intent(getBaseContext(), GeofenceTransitionIntentService.class));
+            GeofenceTransitionIntentService.RUNNING = true;
+        }
     }
 
     protected void callAlarmScheduleService() {
@@ -141,7 +167,8 @@ public class CommuteListActivity extends AppCompatActivity {
                 String destination = data.getStringExtra("destination");
                 String tone = data.getStringExtra("alarmTone");
                 String tonePath = data.getStringExtra("alarmTonePath");
-
+                double latitude = data.getDoubleExtra("latitude", 0.0f);
+                double longitude = data.getDoubleExtra("longitude", 0.0f);
                 boolean sunday = data.getBooleanExtra("sunday", false);
                 boolean monday = data.getBooleanExtra("monday", false);
                 boolean tuesday = data.getBooleanExtra("tuesday", false);
@@ -153,10 +180,14 @@ public class CommuteListActivity extends AppCompatActivity {
 
                 WeeklyInfo w = makeWeek(sunday, monday, tuesday, wednesday, thursday, friday, saturday, repeat);
 
-                Commute newCommute = new Commute(name, destination, arrHour, arrMin, prepMins, w, true, tone, tonePath, this);
+                Commute newCommute = new Commute(name, destination,latitude, longitude, arrHour, arrMin, prepMins, w, true, tone, tonePath, this);
+
                 Context mContext = getApplicationContext();
                 SQLiteDatabase mDatabase = new CommuteBaseHelper(mContext).getWritableDatabase();
                 addItem(newCommute, mDatabase);
+
+                // add new commute to the geofence, make the ID more unique by appending the latitude and longitude
+                GeofenceAssets.addGeofence(newCommute.id + newCommute.latitude + newCommute.longitude, newCommute.latitude, newCommute.longitude);
 
                 Content.populate(this);
                 View recyclerView = findViewById(R.id.commute_list);
@@ -203,6 +234,12 @@ public class CommuteListActivity extends AppCompatActivity {
 
         public SimpleItemRecyclerViewAdapter(List<Commute> items) {
             mValues = items;
+
+            // Add to the geofence list if we need to, make the ID more unique by appending the latitude and longitude
+            for(Commute c : mValues){
+                if(!GeofenceAssets.geofenceExists(c.id + c.latitude + c.longitude))
+                    GeofenceAssets.addGeofence(c.id+ c.latitude + c.longitude, c.latitude, c.longitude);
+            }
         }
 
         @Override
