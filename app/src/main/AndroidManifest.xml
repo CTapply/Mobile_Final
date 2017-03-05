@@ -8,6 +8,8 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
 
     <application
         android:allowBackup="true"
@@ -62,12 +64,12 @@
         </receiver>
 
         <service android:enabled="true" android:name="geofence.GeofenceTransitionIntentService"/>
-        <receiver android:name=".machinelearning.DataGatherReceiver">
+        <service android:name=".machinelearning.DataGatherReceiver">
+        </service>
+
+        <receiver android:name=".machinelearning.BaseNetwork">
             <intent-filter>
-                <action android:name="GEOFENCE"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="ALARM"/>
+                <action android:name="MACHINE"/>
             </intent-filter>
         </receiver>
 

@@ -111,7 +111,6 @@ public class Alarm implements Serializable {
 
             if (response.equals("")) {
                 // Could not connect so set to the default
-                // TODO asdkasjd lkjsdf;dsalkfj sdflkj sf
                 travelTime = 20;
             } else {
 
@@ -127,7 +126,6 @@ public class Alarm implements Serializable {
                     System.out.println("Travel Estimate from Google Directions: " + travelTime);
 
                 } catch (JSONException e) {
-                    // TODO asdasdahsdhasdjashdas
                     travelTime = 20;
                 }
             }
@@ -135,9 +133,11 @@ public class Alarm implements Serializable {
 
         } else {
             // We cant get current location so we cant find the route time, so we should use time from previous travels
-            // TODO lskjfhsad kjlhfl kasdhflkj adslfkjhasd lkfjh asldkjhg askldfh klsadf
             travelTime = 20;
         }
+
+        System.out.println("PREPTIME FOR " + commute.id + " is " + prepTimeInMinutes);
+        System.out.println("TRAVELTIME FOR " + commute.id + " is " + travelTime);
 
         if (type >= 0 && type < 7 ) { // WAKE UP ALARM
 
@@ -195,7 +195,7 @@ public class Alarm implements Serializable {
             intent = new Intent();
             intent.setAction("ALARM");
             intent.putExtra("prep_time", this.prepTimeInMinutes);
-            intent.putExtra("commute_id", this.commute.id);
+            intent.putExtra("commuteID", this.commute.id);
             intent.putExtra("destination", this.commute.destination);
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 

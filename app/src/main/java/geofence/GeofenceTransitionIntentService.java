@@ -89,3 +89,4 @@ public class GeofenceTransitionIntentService extends IntentService {
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }
 }
+

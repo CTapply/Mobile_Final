@@ -218,7 +218,7 @@ public class Content implements Serializable {
         public final String id;
         public final int UUID;
         public String destination;
-        double latitude, longitude;
+        public double latitude, longitude;
         public int arrivalTimeHour;
         public int arrivalTimeMin;
         public String timeMode;

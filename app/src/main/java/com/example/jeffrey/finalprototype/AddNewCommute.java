@@ -287,30 +287,6 @@ public class AddNewCommute extends FragmentActivity{
         }
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle savedInstanceState) {
-//        super.onSaveInstanceState(savedInstanceState);
-//        savedInstanceState.putString("id", editTextID.getText().toString());
-//        savedInstanceState.putString("arr_time", selectedArrTime.getText().toString());
-//        savedInstanceState.putString("prep_time", selectedPrepTime.getText().toString());
-//        savedInstanceState.putString("destination", selectedDestination.getText().toString());
-//
-//    }
-//
-//    @Override
-//    public void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        String commuteID = savedInstanceState.getString("id");
-//        String arrTime = savedInstanceState.getString("arr_time");
-//        String prepTime = savedInstanceState.getString("prep_time");
-//        String dest = savedInstanceState.getString("destination");
-//
-//        editTextID.setText(commuteID);
-//        selectedArrTime.setText(arrTime);
-//        selectedPrepTime.setText(prepTime);
-//        selectedDestination.setText(dest);
-//    }
-
     public void setArrivalTime(int hour, int min) {
         String time = semanticTime(hour, min);
         selectedArrTime.setText(time);

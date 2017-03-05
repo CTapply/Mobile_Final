@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.example.jeffrey.finalprototype.Content.Commute;
 import com.example.jeffrey.finalprototype.Content.WeeklyInfo;
 import com.example.jeffrey.finalprototype.machinelearning.BaseNetwork;
+import com.example.jeffrey.finalprototype.machinelearning.DataGatherReceiver;
 import com.example.jeffrey.finalprototype.weather.JSONWeatherParser;
 import com.example.jeffrey.finalprototype.weather.WeatherHttpClient;
 import com.example.jeffrey.finalprototype.weather.model.Weather;
@@ -59,7 +60,6 @@ import static com.example.jeffrey.finalprototype.Content.addItem;
  */
 public class CommuteListActivity extends AppCompatActivity {
 
-    String defaultCity = "Worcester,us";
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -142,8 +142,8 @@ public class CommuteListActivity extends AppCompatActivity {
 
         callAlarmScheduleService();
 
-        // start geofence service if not already running
         if(!GeofenceTransitionIntentService.RUNNING) {
+            startService(new Intent(getBaseContext(), DataGatherReceiver.class));
             startService(new Intent(getBaseContext(), GeofenceTransitionIntentService.class));
             GeofenceTransitionIntentService.RUNNING = true;
         }
@@ -272,12 +272,7 @@ public class CommuteListActivity extends AppCompatActivity {
             if (holder.mCommute.active) {
                 holder.mAlarmSwitch.setChecked(true);
 
-                // Set the color of the Selected days of the alarm
-//                if (holder.mCommute.weekInfo.repeat == true) {
-//                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081")); // Pink
-//                } else {
-//                    holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
-//                }
+
                 for (int i = 0; i < holder.mCommute.weekInfo.days.length; i++) {
                     if (holder.mCommute.weekInfo.days[i]) {
                         holder.mDayList.get(i).setTextColor(Color.parseColor("#ff4081"));// Pink
@@ -286,14 +281,6 @@ public class CommuteListActivity extends AppCompatActivity {
                     }
                 }
 
-//                // Set the alarm
-//                if (holder.mAlarmSwitch.isChecked()) {
-//                    for (Alarm a : holder.mCommute.alarm) {
-//                        if (a != null) {
-////                        a.setAlarm(getApplicationContext());
-//                        }
-//                    }
-//                }
             } else { // not active
                 holder.mAlarmSwitch.setChecked(false);
 //                holder.mAlarmRepeat.setColorFilter(Color.parseColor("#BDBDBD"));// Light gray
@@ -321,11 +308,6 @@ public class CommuteListActivity extends AppCompatActivity {
                     callAlarmScheduleService();
 
                     // Setting the colors
-//                    if (holder.mCommute.weekInfo.repeat == true) {
-//                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#ff4081"));// Pink
-//                    } else {
-//                        holder.mAlarmRepeat.setColorFilter(Color.parseColor("#757575")); // Dark gray
-//                    }
                     for (int i = 0; i < holder.mCommute.weekInfo.days.length; i ++) {
                         if (holder.mAlarmSwitch.isChecked()) {
                             if (holder.mCommute.weekInfo.days[i]) {

@@ -1,147 +1,127 @@
 package com.example.jeffrey.finalprototype.machinelearning;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+import com.example.jeffrey.finalprototype.Content;
+
+import org.encog.ConsoleStatusReportable;
 import org.encog.Encog;
-import org.encog.engine.network.activation.ActivationSigmoid;
+import org.encog.ml.MLRegression;
 import org.encog.ml.data.MLData;
-import org.encog.ml.data.MLDataPair;
-import org.encog.ml.data.basic.BasicMLDataSet;
-import org.encog.neural.networks.BasicNetwork;
-import org.encog.neural.networks.layers.BasicLayer;
-import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
+import org.encog.ml.data.versatile.NormalizationHelper;
+import org.encog.ml.data.versatile.VersatileMLDataSet;
+import org.encog.ml.data.versatile.columns.ColumnDefinition;
+import org.encog.ml.data.versatile.columns.ColumnType;
+import org.encog.ml.data.versatile.sources.CSVDataSource;
+import org.encog.ml.data.versatile.sources.VersatileDataSource;
+import org.encog.ml.factory.MLMethodFactory;
+import org.encog.ml.model.EncogModel;
+import org.encog.util.csv.CSVFormat;
+import org.encog.util.csv.ReadCSV;
+
+import java.io.File;
+
+import static com.example.jeffrey.finalprototype.Content.COMMUTE_MAP;
 
 /**
  * Created by tjvalcourt on 2/21/2017.
  */
 
-public class BaseNetwork {
+public class BaseNetwork extends BroadcastReceiver{
 
-    private BasicNetwork network;
+    private final int FOLDS = 5;
 
-    // Test on the tried and true example of XOR
-    private double[][] XORInput = {
-            {0,0},
-            {0,1},
-            {1,0},
-            {1,1}
-    };
-    private double[][] XOROutput = {
-            {0},{1},{1},{1}
-    };
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        System.out.println("MACHINE: Received broadcast from datagathereceiever");
+        if(intent.getAction().equals("MACHINE")) {
+            int dataCount = 0;
 
-    public BaseNetwork(){
-        network = new BasicNetwork();
+            // read the file first out of curiosity
+            String inputLine;
+            File trainingFile = null;
+            StringBuffer outStringBuf = new StringBuffer();
+            try {
+                trainingFile = new File(context.getFilesDir() + "/training_data_fin.csv");
+            } catch (Exception e){
+                e.printStackTrace();
+            }
 
-        // add Basic layer, 2 sigmoid layers 1 with bias and 1 without
-        network.addLayer(new BasicLayer(null, true, 2));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 3));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), false, 1));
-        network.getStructure().finalizeStructure();
-        network.reset();
+            if(dataCount >= FOLDS) {
+                // Define the format of the data file.
+                // This area will change, depending on the columns and
+                // format of the file that you are trying to model.
+                VersatileDataSource source = new CSVDataSource(trainingFile, false, CSVFormat.DECIMAL_POINT);
+                VersatileMLDataSet data = new VersatileMLDataSet(source);
+                data.defineSourceColumn("prepTime", 0, ColumnType.continuous);
+                data.defineSourceColumn("day", 1, ColumnType.continuous);
+                data.defineSourceColumn("snowfall", 2, ColumnType.continuous);
 
-        // create a training data set
-        BasicMLDataSet trainingSet = new BasicMLDataSet(XORInput, null);
-        ResilientPropagation train = new ResilientPropagation(network, trainingSet);
-        //BasicMLDataSet set = new BasicMLDataSet()
+                // Define the output column
+                ColumnDefinition outputColumn = data.defineSourceColumn("newPrepTime", 3, ColumnType.continuous);
 
-        // Train!
-        int epoch = 1 ;
-        do {
-            train.iteration();
-            System.out.println("Epoch #" + epoch + "\tError: " + train.getError());
-            epoch++;
-        } while (train.getError() > 0.01);
-        train.finishTraining();
+                // Analyze the data
+                data.analyze();
 
-        // Display Results
-        System.out.println("\nNeural Network Results");
-        for(MLDataPair pair : trainingSet){
-            MLData output = network.compute(pair.getInput());
-            System.out.println(pair.getInput().getData(0) + ", "
-                    + pair.getInput().getData(1) + ",actual="
-                    + output.getData(0)+ "\tideal="
-                    + pair.getIdeal().getData(0));
+                // Map prediction column to the output
+                data.defineSingleOutputOthersInput(outputColumn);
+
+                // Create a feed forward network model
+                EncogModel model = new EncogModel(data);
+                model.selectMethod(data, MLMethodFactory.TYPE_FEEDFORWARD);
+
+                // send output to console
+                model.setReport(new ConsoleStatusReportable());
+
+                // normalize the data; normalization handled by the type of model we chose
+                data.normalize();
+
+                // Hold back some data for a final validation, shuffle, and seed it with the same value
+                model.holdBackValidation(0.3, true, 777);
+
+                // Choose whatever is the default training type for this model.
+                model.selectTrainingType(data);
+
+                // Use a 5-fold cross-validated train.  Return the best method found.
+                MLRegression bestMethod = (MLRegression) model.crossvalidate(5, true);
+
+                // Display our normalization parameters.
+                NormalizationHelper helper = data.getNormHelper();
+
+                // Loop over the training dataset to first train the model
+                ReadCSV csv = new ReadCSV(trainingFile, false, CSVFormat.DECIMAL_POINT);
+                String[] line = new String[3];
+                MLData input = helper.allocateInputVector();
+
+                // Now test the data point from the Intent
+                line[0] = intent.getStringExtra("prepTime");
+                line[1] = intent.getStringExtra("day");
+                line[2] = intent.getStringExtra("snowfall");
+
+                String correct = intent.getStringExtra("newPrepTime");
+                helper.normalizeInputVector(line, input.getData(), false);
+                MLData output = bestMethod.compute(input);
+
+                String calc = helper.denormalizeOutputVectorToString(output)[0];
+                setCommutePrep(intent.getStringExtra("commuteID"), calc); // set the commute to the predicted time
+
+                Encog.getInstance().shutdown(); // stop running the learning
+            }
         }
-
-        Encog.getInstance().shutdown();
     }
 
     /**
-     * Helper function for calcSnowDelay();
-     * Calculates the coefficient between [0.25, 1.25] based on the input latitude
-     * @param latitude Latitude in degrees of the selected location
-     * @return Coefficient in range [0.25, 1.25]
+     * Set the commute to have the new prep time and also
+     * call to update the database entry
      */
-    public float calcCoefficient(float latitude){
-        final float latMax = 55, latMin = 20;
-        final float coefficientMax = 1.25f, coefficientMin = 0.25f;
-
-        /**
-         * We bind the range of the latitude between 55 degrees (Thompson, Manitoba)
-         * and 20 degrees (Mexico City) for simplicity. Anything above or below
-         * is set to these thresholds
-         */
-        if(latitude > latMax)
-            latitude = latMax;
-
-        if(latitude < latMin)
-            latitude = latMin;
-
-        // The offset is the amount per degree latitude we add to the coefficient
-        float offset = (coefficientMax - coefficientMin) / (latMax - latMin);
-
-        // Calculated coefficient based on the offset from the input latitude
-        float coefficient = coefficientMin + ((latMax - latitude) * offset);
-
-        return coefficient;
-    }
-
-    /**
-     * Calculate the snow delay time (in minutes) based on the latitude and amount of snowfall
-     * @param snowfall Amount of snowfall in inches
-     * @param latitude Location of the commute in degrees
-     * @return Number of minutes delayed by the snow
-     */
-    public int calcSnowDelay(int snowfall, float latitude){
-        return (int)(calcCoefficient(latitude)*(snowfall + 10));
+    private void setCommutePrep(String commuteID, String finalPrepTime){
+        for(Content.Commute c : COMMUTE_MAP.values()) {
+            if (c.id.equals(commuteID)) {
+                c.preparationTime = (int)Double.parseDouble(finalPrepTime);
+                c.updateCommute();
+            }
+        }
     }
 }
-/**
-    Calculate Snow Delay based on: inches, location
-    Calculate Prep Time based on : User_Time, Last_Prep_By_Day_of_Week, + Snow Delay
-
-    Set some form of latitude as a range;
-        > ex south carolina coefficient is 1 (most extreme)
-               : North of Maine asymptotes to something low (doesn't matter as much)
-
-                coefficient * (num_inches + 10)               c [0.25, 1.25]
-                max_delay caps at 15 minutes
-
-    training_set = {expected = 20, Monday}
-    output_set = {actual_time = 22}
-
-    prep_time = output + snow_delay
- */
-
-/**
-    Thresh_Max = 55.7435 (Thompson, Manitoba, Canada    ~ 55
-    Thresh_Min = 19.428471 (Mexico City, Mexico)        ~ 20
- */
-
-/**
-    Use the database to store training data about the neural network
-        : Each commute needs to keep track of its own data
-
-        : Does this mean that we re-train the network every single time???
- */
-
-/**
-private int input[][] = {
-        {expected_time, last_prep}
-}
-
-private int output[][] = {
-        {actual_time}
-}
-
-        prep = actual_time + snow_delay
-*/
